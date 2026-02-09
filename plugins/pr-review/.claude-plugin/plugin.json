@@ -1,0 +1,8 @@
+{
+  "name": "pr-review",
+  "description": "Analyze a GitHub PR's diff and post inline review comments via the GitHub API. Supports impact scope analysis for breaking changes, evidence-based severity classification, and configurable output language.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Noah"
+  }
+}

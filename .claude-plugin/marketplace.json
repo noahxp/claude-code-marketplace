@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "noah-marketplace",
+  "description": "Noah's personal Claude Code plugin marketplace",
+  "owner": {
+    "name": "Noah"
+  },
+  "plugins": [
+    {
+      "name": "pr-review",
+      "description": "Analyze a GitHub PR's diff and post inline review comments via the GitHub API. Supports impact scope analysis for breaking changes, evidence-based severity classification, and configurable output language.",
+      "author": {
+        "name": "Noah"
+      },
+      "source": "./plugins/pr-review",
+      "category": "Development",
+      "version": "1.0.0",
+      "tags": ["pr-review", "pr", "github"]
+    }
+  ]
+}
