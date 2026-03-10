@@ -56,12 +56,17 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(openspec *:*), Bash(cd *:*), Ba
 
 ### Phase 1: 需求分析與品質把關
 
-4. **建立 feature branch**
+4. **建立 feature branch（關聯 Issue）**
 
-   從 **dev** 分支建立（若 branch 已存在則 checkout）：
+   從 **dev** 分支建立，並透過 `gh issue develop` 將分支關聯至 Issue（使 PR 自動出現在 Issue 的 Development 區塊）：
    ```bash
    git checkout dev && git pull
-   git checkout -b feature/NNN-kebab-name
+   gh issue develop $ARGUMENTS --base dev --name feature/NNN-kebab-name --checkout
+   ```
+
+   若 branch 已存在（重入情境），`gh issue develop` 會失敗，改為直接 checkout：
+   ```bash
+   git checkout feature/NNN-kebab-name
    ```
 
 5. **閱讀相關原始需求規格**
@@ -269,7 +274,15 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(openspec *:*), Bash(cd *:*), Ba
     )"
     ```
 
-    顯示 PR URL，流程完成。
+    顯示 PR URL。
+
+18. **清場**
+
+    關閉流程中啟動的所有資源：
+    1. 停止前端 / 後端開發 server（透過 `kill` 或對應的停止指令）
+    2. 關閉 Chrome DevTools MCP 開啟的瀏覽器實例
+
+    確認所有資源已釋放後，流程完成。
 
 ---
 
