@@ -1,7 +1,7 @@
 ---
 name: process-issue
 description: 從 GitHub Issue 一貫執行到 Draft PR（含 spec 撰寫、審查、OpenSpec 工作流、review、e2e、歸檔）
-allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(openspec *:*), Bash(cd *:*), Bash(mkdir *:*), Bash(mv *:*), Bash(gradle *:*), Bash(npm *:*), Read, Write, Edit, Grep, Glob, Agent, Skill, TodoWrite
+allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), Bash(npm *:*), Bash(pkill *:*), Bash(curl *:*), Bash(date *:*), Read, Write, Edit, Grep, Glob, Agent, Skill, TodoWrite
 ---
 
 # RMS: Process Issue
@@ -20,6 +20,12 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(openspec *:*), Bash(cd *:*), Ba
 > - 不得直接使用 Skill tool 調用其他 skill（Skill tool 會將控制權轉移至內層 skill，無法自動返回）
 
 ### Phase 0: 初始化與重入偵測
+
+0. **記錄開始時間**
+
+   ```bash
+   START_TIME=$(date +%s)
+   ```
 
 1. **讀取 GH Issue**
 
@@ -201,8 +207,12 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(openspec *:*), Bash(cd *:*), Ba
 14. **E2E 測試**
 
     1. 撰寫 `sa/spec/NNN-xxx/e2e.md`（E2E 測試腳本）
-    2. 使用 Chrome DevTools MCP 執行測試
+    2. 啟動後端與前端開發伺服器（使用 Bash tool 的 `run_in_background: true`），等待就緒後執行測試
     3. 將測試結果記錄回 `e2e.md`
+
+    **測試方式**（依可用工具選擇）：
+    - 若有 Chrome DevTools MCP → 使用瀏覽器自動化執行 UI 測試
+    - 若無 → 透過 API 直接呼叫 + 原始碼確認驗證，並在 `e2e.md` 註明驗證方式
 
 15. **OpenSpec archive**
 
@@ -279,10 +289,21 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(openspec *:*), Bash(cd *:*), Ba
 18. **清場**
 
     關閉流程中啟動的所有資源：
-    1. 停止前端 / 後端開發 server（透過 `kill` 或對應的停止指令）
-    2. 關閉 Chrome DevTools MCP 開啟的瀏覽器實例
+    1. 以 `pkill` 終止步驟 14 啟動的後端（`bootRun`）與前端（`vite`）dev server
+    2. 若有 Chrome DevTools MCP 開啟的瀏覽器實例，一併關閉
+    3. **等待背景任務通知到達**：`pkill` 後會收到 `run_in_background` 的 task-notification（status=failed），這是主動終止的預期行為。**必須在 skill 流程內收到並確認這些通知**，不可在通知到達前就結束流程，否則通知會漏到 skill 結束後，造成使用者困惑。
 
-    確認所有資源已釋放後，流程完成。
+19. **完成回報**
+
+    計算並顯示總執行時間：
+    ```bash
+    END_TIME=$(date +%s)
+    ELAPSED=$((END_TIME - START_TIME))
+    MINUTES=$((ELAPSED / 60))
+    SECONDS=$((ELAPSED % 60))
+    ```
+
+    顯示：「Issue #NNN 流程完成，總執行時間：M 分 S 秒」，流程結束。
 
 ---
 
