@@ -16,6 +16,17 @@
       "category": "Development",
       "version": "1.0.0",
       "tags": ["pr-review", "pr", "github"]
+    },
+    {
+      "name": "rms",
+      "description": "RMS 專案自動化工作流：從 GitHub Issue 一貫執行到 Draft PR（含 spec 撰寫、審查、OpenSpec 工作流、review、e2e、歸檔）",
+      "author": {
+        "name": "Noah"
+      },
+      "source": "./plugins/rms",
+      "category": "Development",
+      "version": "1.0.0",
+      "tags": ["rms", "workflow", "issue", "automation"]
     }
   ]
 }
