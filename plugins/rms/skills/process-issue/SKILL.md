@@ -25,6 +25,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
    ```bash
    START_TIME=$(date +%s)
+   ORIGINAL_BRANCH=$(git branch --show-current)
    ```
 
 1. **讀取 GH Issue**
@@ -187,6 +188,8 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     ---
 
     @ASSIGNEE @AUTHOR 以上為既有問題（非本次變更引入），建議評估是否需要處理。
+
+    > 🤖 Generated with Claude Code
     EOF
     )"
     ```
@@ -292,6 +295,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     1. 以 `pkill` 終止步驟 14 啟動的後端（`bootRun`）與前端（`vite`）dev server
     2. 若有 Chrome DevTools MCP 開啟的瀏覽器實例，一併關閉
     3. **等待背景任務通知到達**：`pkill` 後會收到 `run_in_background` 的 task-notification（status=failed），這是主動終止的預期行為。**必須在 skill 流程內收到並確認這些通知**，不可在通知到達前就結束流程，否則通知會漏到 skill 結束後，造成使用者困惑。
+    4. 切回原始 branch：`git checkout $ORIGINAL_BRANCH`
 
 19. **完成回報**
 
@@ -303,7 +307,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     SECONDS=$((ELAPSED % 60))
     ```
 
-    顯示：「Issue #NNN 流程完成，總執行時間：M 分 S 秒」，流程結束。
+    顯示：「Issue #NNN 流程完成（branch: `feature/NNN-kebab-name`），總執行時間：M 分 S 秒」，流程結束。
 
 ---
 
@@ -328,6 +332,8 @@ gh issue comment $ARGUMENTS --body "$(cat <<'EOF'
 ---
 
 @ASSIGNEE 請確認上述問題。確認後可重新執行 `/rms:process-issue $ARGUMENTS` 接續處理。
+
+> 🤖 Generated with Claude Code
 EOF
 )"
 ```
