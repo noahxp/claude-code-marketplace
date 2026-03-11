@@ -172,7 +172,11 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     | **不需討論**：修正方式明確、風險低、不涉及架構決策（如：缺少 try-catch、缺少 console.warn、空 catch block） | 直接在本次 PR 中一併修復，commit message 以 `fix:` 或 `refactor:` 獨立提交（與主要修正分開 commit），並在 PR body 的「額外修正」區塊列出 |
     | **需要討論**：涉及架構決策、影響範圍大、需求不明確、或可能改變既有行為（如：型別設計變更、API 契約調整、跨模組重構） | 在 GH Issue 上留言通知 assignees 與 author，格式見下方 |
 
-    **既有問題需討論時的留言格式**：
+    **既有問題需討論時的留言流程**：
+
+    對每一項「需要討論」的問題，先執行「Issue 留言去重檢查」（見上方共用子程序），僅將未被追蹤的項目納入留言。
+
+    留言格式：
 
     ```bash
     gh issue comment $ARGUMENTS --body "$(cat <<'EOF'
@@ -186,6 +190,9 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     - **建議**：修正方向
 
     ---
+
+    > 以下問題已有 Issue 追蹤，不再重複列出：#XX, #YY
+    > _(此行僅在有被過濾項目時顯示)_
 
     @ASSIGNEE @AUTHOR 以上為既有問題（非本次變更引入），建議評估是否需要處理。
 
@@ -311,12 +318,35 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
 ---
 
+## Issue 留言去重檢查（共用子程序）
+
+在留言至 GH Issue 之前，對每一項問題逐項執行以下去重檢查：
+
+### 搜尋策略
+
+由 LLM 根據每項問題的內容，自行決定最有效的搜尋策略：
+- 自行判斷需要幾輪搜尋、使用哪些關鍵字，確保充分覆蓋不同表述方式（中英文、同義詞、相關元件名稱等）
+- 使用 `gh issue list --search "<查詢>" --json number,title,body --limit 10` 搜尋 open issues
+- 由 LLM 語意比對搜尋結果的 title 與 body，判斷是否已有 Issue 追蹤相同問題
+- 判斷標準：「該既有 Issue 明確描述了相同的問題，或涵蓋此問題的上層 Issue」即為匹配
+
+### 分流處理
+
+| 情境 | 處理方式 |
+|------|---------|
+| **所有項目皆已追蹤** | 不留言，僅在流程日誌中記錄「已追蹤於 #XX, #YY」 |
+| **部分已追蹤** | 僅留言未追蹤項目，底部附註「其餘問題已追蹤於 #XX, #YY」 |
+| **無匹配** | 正常留言（所有項目） |
+
+---
+
 ## 中止流程
 
 在把關點 1 或 2 不通過時：
 
 1. 將發現的問題整理為結構化留言
-2. 在 GH Issue 上留言並 tag assignees
+2. 對每項問題執行「Issue 留言去重檢查」（見上方共用子程序）。若所有問題皆已追蹤，跳過留言，直接向使用者回報對應 Issue 編號，然後執行步驟 4（清場）
+3. 在 GH Issue 上留言並 tag assignees（僅包含未被追蹤的項目）
 
 ```bash
 gh issue comment $ARGUMENTS --body "$(cat <<'EOF'
@@ -331,6 +361,9 @@ gh issue comment $ARGUMENTS --body "$(cat <<'EOF'
 
 ---
 
+> 以下問題已有 Issue 追蹤，不再重複列出：#XX, #YY
+> _(此行僅在有被過濾項目時顯示)_
+
 @ASSIGNEE 請確認上述問題。確認後可重新執行 `/rms:process-issue $ARGUMENTS` 接續處理。
 
 > 🤖 Generated with Claude Code
@@ -338,7 +371,7 @@ EOF
 )"
 ```
 
-3. 向使用者回報中止原因與 Issue comment 連結
+4. 向使用者回報中止原因與 Issue comment 連結
 
 ---
 
