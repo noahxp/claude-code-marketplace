@@ -1,10 +1,10 @@
 ---
-name: process-issue
+name: gh-issue-autopilot
 description: 從 GitHub Issue 一貫執行到 Draft PR（含 spec 撰寫、審查、OpenSpec 工作流、review、e2e、歸檔）
 allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), Bash(npm *:*), Bash(pkill *:*), Bash(curl *:*), Bash(date *:*), Read, Write, Edit, Grep, Glob, Agent, Skill, TodoWrite
 ---
 
-# RMS: Process Issue
+# GH Issue Autopilot
 
 從 GitHub Issue 自動執行完整開發流程到 Draft PR。含 SA spec 撰寫、雙重品質把關、OpenSpec 工作流、Code Review、E2E 測試、歸檔與 PR 建立。
 
@@ -364,7 +364,7 @@ gh issue comment $ARGUMENTS --body "$(cat <<'EOF'
 > 以下問題已有 Issue 追蹤，不再重複列出：#XX, #YY
 > _(此行僅在有被過濾項目時顯示)_
 
-@ASSIGNEE 請確認上述問題。確認後可重新執行 `/rms:process-issue $ARGUMENTS` 接續處理。
+@ASSIGNEE 請確認上述問題。確認後可重新執行 `/noah:gh-issue-autopilot $ARGUMENTS` 接續處理。
 
 > 🤖 Generated with Claude Code
 EOF

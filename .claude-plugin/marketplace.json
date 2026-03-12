@@ -7,26 +7,15 @@
   },
   "plugins": [
     {
-      "name": "pr-review",
-      "description": "Analyze a GitHub PR's diff and post inline review comments via the GitHub API. Supports impact scope analysis for breaking changes, evidence-based severity classification, and configurable output language.",
+      "name": "noah",
+      "description": "Noah 的個人開發工具集：含 GitHub Issue 自動化工作流與 PR Review",
       "author": {
         "name": "Noah"
       },
-      "source": "./plugins/pr-review",
+      "source": "./plugins/noah",
       "category": "Development",
       "version": "1.0.0",
-      "tags": ["pr-review", "pr", "github"]
-    },
-    {
-      "name": "rms",
-      "description": "RMS 專案自動化工作流：從 GitHub Issue 一貫執行到 Draft PR（含 spec 撰寫、審查、OpenSpec 工作流、review、e2e、歸檔）",
-      "author": {
-        "name": "Noah"
-      },
-      "source": "./plugins/rms",
-      "category": "Development",
-      "version": "1.0.0",
-      "tags": ["rms", "workflow", "issue", "automation"]
+      "tags": ["noah", "gh-issue-autopilot", "pr-review", "workflow", "automation"]
     }
   ]
 }

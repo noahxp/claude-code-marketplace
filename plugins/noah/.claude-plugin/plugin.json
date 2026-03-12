@@ -1,0 +1,8 @@
+{
+  "name": "noah",
+  "description": "Noah 的個人開發工具集：含 GitHub Issue 自動化工作流與 PR Review",
+  "version": "1.0.0",
+  "author": {
+    "name": "Noah"
+  }
+}

@@ -6,7 +6,8 @@ Noah 的個人 Claude Code Plugin Marketplace。
 
 | Plugin | 說明 | 版本 |
 |--------|------|------|
-| [pr-review](./plugins/pr-review) | 分析 GitHub PR diff 並透過 GitHub API 發布 inline review comments | 1.0.0 |
+| [noah:pr-review](./plugins/noah/skills/pr-review) | 分析 GitHub PR diff 並透過 GitHub API 發布 inline review comments | 1.0.0 |
+| [noah:gh-issue-autopilot](./plugins/noah/skills/gh-issue-autopilot) | 從 GitHub Issue 一貫執行到 Draft PR（含 spec 撰寫、審查、OpenSpec 工作流、review、e2e、歸檔） | 1.0.0 |
 
 ## 安裝方式
 

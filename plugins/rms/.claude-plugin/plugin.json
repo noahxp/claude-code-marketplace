@@ -1,8 +1,0 @@
-{
-  "name": "rms",
-  "description": "RMS 專案自動化工作流：從 GitHub Issue 一貫執行到 Draft PR",
-  "version": "1.0.0",
-  "author": {
-    "name": "Noah"
-  }
-}
