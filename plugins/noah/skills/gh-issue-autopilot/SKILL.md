@@ -50,7 +50,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
    | 偵測條件 | 接續點 |
    |---------|--------|
    | 無 feature branch、無 spec | 從頭開始（Phase 1） |
-   | 有 branch + spec，但無 OpenSpec change | 讀取 Issue comments 取得釐清結果 → Phase 1 步驟 4（Spec 審查） |
+   | 有 branch + spec，但無 OpenSpec change | 讀取 Issue comments 取得釐清結果 → Phase 1 步驟 5（Spec 審查） |
    | 有 branch + spec + OpenSpec change（tasks 未完成）| Phase 2 步驟 2（apply） |
    | 有 branch + spec + OpenSpec change（tasks 全完成）| Phase 2 步驟 3（verify） |
    | 已有 Draft PR | 回報「Issue #NNN 已有 Draft PR，中止」 |
@@ -80,7 +80,22 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
    根據 CLAUDE.md §規格文件 的檔案對應關係，讀取 `spec-ag-opus45/` 中對應的規格文件。涉及跨模組時一併閱讀 `00-系統總覽.md`。
 
-6. **撰寫 SA spec**
+6. **把關點 0：Issue 健康度檢核**
+
+   根據前面步驟取得的 Issue 內容、原始需求規格與現有程式碼，檢核以下五項：
+
+   1. **問題是否仍存在？** — 檢查 dev 分支最新程式碼與 commit 歷史，確認問題未被其他 PR 修復
+   2. **需求是否明確？** — Issue 描述是否完整，有無模糊或缺漏的需求定義
+   3. **影響範圍預估** — 涉及哪些檔案與模組，是否跨模組
+   4. **是否適合 autopilot？** — 需求邊界清晰、不涉及架構大改、影響範圍可控
+   5. **前置作業** — 有無相依 Issue 未完成，或與其他進行中的工作衝突
+
+   | 結論 | 後續動作 |
+   |------|---------|
+   | ✅ 通過 | 繼續至步驟 7（撰寫 SA spec） |
+   | ❌ 不通過 | 執行「中止流程」，處理階段標為「Issue 健康度檢核」 |
+
+7. **撰寫 SA spec**
 
    寫入 `sa/spec/NNN-xxx/spec.md`。
    - 若為首次執行：根據 Issue body + 原始需求規格撰寫
@@ -88,18 +103,32 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
    Spec 內容須包含：業務背景、規格書依據、現狀分析、修正規格、影響範圍、測試規格。
 
-7. **把關點 1：Spec 自審**
+8. **把關點 1：Spec 自審**
 
-   檢查四項標準：
-   1. 無邏輯衝突
-   2. 需求定義完整
-   3. 無遺漏必要欄位
-   4. 與既有架構一致
+   **審查定位**：純文件品質審查，確保 spec.md 忠實且完整地反映 Issue 需求，不涉及程式碼層面（程式碼交給 Step 9 Explore）。
 
-   **通過** → 繼續至步驟 8
-   **不通過** → 執行「中止流程」（見下方）
+   **參照來源**：
+   - Issue 原始需求：Issue body + comments 中的補充說明
+   - Step 7 規定的 spec 章節：業務背景、規格書依據、現狀分析、修正規格、影響範圍、測試規格
 
-8. **把關點 2：Explore**
+   **四項檢查標準**：
+
+   | # | 檢查項目 | 檢查方法 | 不通過範例 |
+   |---|---------|---------|-----------|
+   | 1 | **需求覆蓋度** | 逐條比對 Issue 需求點，確認 spec 每項都有對應的修正規格 | Issue 提了三個修正點，spec 只寫了兩個 |
+   | 2 | **無過度需求** | 確認 spec 的修正規格沒有超出 Issue 要求的範圍 | Issue 只要修 filter，spec 卻順便重構整個查詢模組 |
+   | 3 | **章節完整性** | 確認 Step 7 要求的六個章節皆有實質內容（非空或佔位文字） | 「測試規格」章節只寫「待補」 |
+   | 4 | **內部一致性** | 修正規格、影響範圍、測試規格三者之間邏輯自洽 | 修正規格改了 A 和 B，但影響範圍只列了 A |
+
+   **審查結果分流**：
+
+   | 審查結果 | 處理方式 |
+   |---------|---------|
+   | **全數通過** | 繼續至步驟 9 |
+   | **可自行修正**（缺漏或不一致處有明確的正確答案，如：漏列影響範圍、測試規格不完整） | 直接修正 spec.md，修正後繼續至步驟 9 |
+   | **需要釐清**（Issue 需求本身模糊、存在多種合理解讀、或需求覆蓋度無法自行判定） | 執行「中止流程」（見下方） |
+
+9. **把關點 2：Explore**
 
    以 `/opsx:explore` 的思維模式，深入探索 spec 與現有程式碼的交互：
    - 讀取相關的現有程式碼（Controller、Service、Entity、前端元件等）
@@ -114,28 +143,28 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
 ### Phase 2: 實作與驗證
 
-9. **OpenSpec propose**
+10. **OpenSpec propose**
 
-   從 SA spec + Issue 內容推導 change name（kebab-case + NNN 編號後綴，如 `filter-options-null-023`）。
+    從 SA spec + Issue 內容推導 change name（kebab-case + NNN 編號後綴，如 `filter-options-null-023`）。
 
-   使用 **Agent tool**（general-purpose）執行：
-   > 使用 Skill tool 調用 `opsx:propose`，參數為以下描述：
-   > 「<從 SA spec 整理的 change 描述，含 Issue 編號、變更內容、影響範圍>」
-   > Change name 為 `<change-name>`。
-   > SA spec 位於 `sa/spec/NNN-xxx/spec.md`。
+    使用 **Agent tool**（general-purpose）執行：
+    > 使用 Skill tool 調用 `opsx:propose`，參數為以下描述：
+    > 「<從 SA spec 整理的 change 描述，含 Issue 編號、變更內容、影響範圍>」
+    > Change name 為 `<change-name>`。
+    > SA spec 位於 `sa/spec/NNN-xxx/spec.md`。
 
-   Agent 完成後，讀取回傳結果確認 artifacts 已建立，**立即繼續步驟 10**。
+    Agent 完成後，讀取回傳結果確認 artifacts 已建立，**立即繼續步驟 11**。
 
-10. **OpenSpec apply**
+11. **OpenSpec apply**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `opsx:apply`，參數為 change name `<change-name>`。
     > 遵循 TDD 流程（Red → Green → Refactor）實作所有 tasks。
     > 後端必須撰寫測試（單元 + 整合），前端不撰寫測試。
 
-    Agent 完成後，讀取回傳結果確認所有 tasks 已完成，**立即繼續步驟 11**。
+    Agent 完成後，讀取回傳結果確認所有 tasks 已完成，**立即繼續步驟 12**。
 
-11. **OpenSpec verify**
+12. **OpenSpec verify**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `opsx:verify`，參數為 change name `<change-name>`。
@@ -149,7 +178,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
 ### Phase 3: 品質審查
 
-12. **Code Review（平行 subagent）**
+13. **Code Review（平行 subagent）**
 
     使用 Agent tool 同時啟動三個 subagent：
     - `pr-review-toolkit:code-reviewer` — 程式碼品質、邏輯錯誤、安全漏洞
@@ -169,8 +198,20 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
     | 判斷條件 | 處理方式 |
     |---------|---------|
-    | **不需討論**：修正方式明確、風險低、不涉及架構決策（如：缺少 try-catch、缺少 console.warn、空 catch block） | 直接在本次 PR 中一併修復，commit message 以 `fix:` 或 `refactor:` 獨立提交（與主要修正分開 commit），並在 PR body 的「額外修正」區塊列出 |
-    | **需要討論**：涉及架構決策、影響範圍大、需求不明確、或可能改變既有行為（如：型別設計變更、API 契約調整、跨模組重構） | 在 GH Issue 上留言通知 assignees 與 author，格式見下方 |
+    | **不需討論**：修正方式明確、風險低、不涉及架構決策（如：缺少 try-catch、缺少 console.warn、空 catch block） | 直接修正，與主要變更合併 commit |
+    | **可直接修正**：雖涉及較大變更，但確認 (1) 不影響 `sa/spec/NNN-xxx/spec.md` 定義的需求規格，且 (2) 無其他 GH Issue 列管 | 直接修正，**獨立 commit**（`fix:` 或 `refactor:`），並列入 PR body「額外修正」區塊 |
+    | **需要討論**：修正會改變 SA spec 定義的需求規格、需求不明確、或影響範圍無法自行判定 | 在 GH Issue 上留言通知 assignees 與 author，格式見下方 |
+
+    **既有問題分流判定流程**：
+
+    對每一項「既有程式碼問題」，依序執行：
+
+    1. **Issue 列管檢查**（「Issue 留言去重檢查」共用子程序）— 已有 Issue 追蹤的項目直接跳過，不做任何處理
+    2. **SA Spec 影響度判定** — 讀取 `sa/spec/NNN-xxx/spec.md`，比對該問題的修正是否會改變 spec 定義的需求規格（含業務邏輯、API 契約、資料模型等）
+    3. 分流：
+       - 修正方式明確且風險低 → 歸入「不需討論」
+       - 不影響 spec 定義的需求規格 → 歸入「可直接修正」，在本次 PR 中以獨立 commit 修復
+       - 影響 spec 定義的需求規格、需求不明確、或影響範圍無法自行判定 → 歸入「需要討論」，走下方留言流程
 
     **既有問題需討論時的留言流程**：
 
@@ -201,7 +242,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     )"
     ```
 
-13. **Code Simplify**
+14. **Code Simplify**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `simplify`。
@@ -214,7 +255,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
 ### Phase 4: E2E 測試與收尾
 
-14. **E2E 測試**
+15. **E2E 測試**
 
     1. 撰寫 `sa/spec/NNN-xxx/e2e.md`（E2E 測試腳本）
     2. 啟動後端與前端開發伺服器（使用 Bash tool 的 `run_in_background: true`），等待就緒後執行測試
@@ -224,16 +265,16 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     - 若有 Chrome DevTools MCP → 使用瀏覽器自動化執行 UI 測試
     - 若無 → 透過 API 直接呼叫 + 原始碼確認驗證，並在 `e2e.md` 註明驗證方式
 
-15. **OpenSpec archive**
+16. **OpenSpec archive**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `opsx:archive`，參數為 change name `<change-name>`。
     > 歸檔變更並同步 delta specs 至 main specs。
     > 遇到確認提示時一律選擇「同步並歸檔」。
 
-    Agent 完成後，讀取回傳結果確認歸檔完成，**立即繼續步驟 16**。
+    Agent 完成後，讀取回傳結果確認歸檔完成，**立即繼續步驟 17**。
 
-16. **Git Commit**
+17. **Git Commit**
 
     將所有變更提交。Commit message **必須包含 subject + body + footer**，格式如下：
 
@@ -256,7 +297,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     - Subject、Body、Footer 之間各隔一行空行
     - 若有「額外修正（既有問題）」，以獨立 commit 提交，subject 使用對應的 type
 
-17. **開 Draft PR**
+18. **開 Draft PR**
 
     ```bash
     gh pr create --draft --base dev \
@@ -296,15 +337,15 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
     顯示 PR URL。
 
-18. **清場**
+19. **清場**
 
     關閉流程中啟動的所有資源：
-    1. 以 `pkill` 終止步驟 14 啟動的後端（`bootRun`）與前端（`vite`）dev server
+    1. 以 `pkill` 終止步驟 15 啟動的後端（`bootRun`）與前端（`vite`）dev server
     2. 若有 Chrome DevTools MCP 開啟的瀏覽器實例，一併關閉
     3. **等待背景任務通知到達**：`pkill` 後會收到 `run_in_background` 的 task-notification（status=failed），這是主動終止的預期行為。**必須在 skill 流程內收到並確認這些通知**，不可在通知到達前就結束流程，否則通知會漏到 skill 結束後，造成使用者困惑。
     4. 切回原始 branch：`git checkout $ORIGINAL_BRANCH`
 
-19. **完成回報**
+20. **完成回報**
 
     計算並顯示總執行時間：
     ```bash
@@ -342,7 +383,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
 ## 中止流程
 
-在把關點 1 或 2 不通過時：
+在把關點 0、1 或 2 不通過時：
 
 1. 將發現的問題整理為結構化留言
 2. 對每項問題執行「Issue 留言去重檢查」（見上方共用子程序）。若所有問題皆已追蹤，跳過留言，直接向使用者回報對應 Issue 編號，然後執行步驟 4（清場）
@@ -352,7 +393,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 gh issue comment $ARGUMENTS --body "$(cat <<'EOF'
 ## 🤖 自動處理中止：需要討論
 
-**處理階段**：[Spec 審查 / Explore 探索]
+**處理階段**：[Issue 健康度檢核 / Spec 審查 / Explore 探索]
 
 以下問題需要釐清後才能繼續：
 

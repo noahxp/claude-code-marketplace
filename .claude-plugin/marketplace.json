@@ -14,7 +14,7 @@
       },
       "source": "./plugins/noah",
       "category": "Development",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "tags": ["noah", "gh-issue-autopilot", "pr-review", "workflow", "automation"]
     }
   ]
