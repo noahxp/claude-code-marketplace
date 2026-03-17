@@ -19,6 +19,31 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 > - 調用其他 Skill（如 `/opsx:propose`、`/opsx:apply`、`/opsx:verify`、`/opsx:archive`）時，**必須透過 Agent tool（general-purpose）包裝**，確保完成後控制權回到本流程
 > - 不得直接使用 Skill tool 調用其他 skill（Skill tool 會將控制權轉移至內層 skill，無法自動返回）
 
+### Commit Message Convention
+
+流程中有多個 commit 時間點（步驟 11、14、17、20），皆遵循以下規範：
+
+```bash
+git add <相關檔案>
+git commit -m "$(cat <<'EOF'
+<type>: <繁體中文描述> (#NNN)
+
+<Why — 說明變更動機與背景>
+
+Refs #NNN
+EOF
+)"
+```
+
+- **type**：執行 `git diff --cached` 判斷變更內容，據此選擇適當的 Conventional Commits type（`feat:` / `fix:` / `refactor:` / `docs:` / `perf:` / `test:` / `style:` / `chore:` 等）
+- **Subject**（What）：繁體中文描述，結尾附 `(#NNN)`
+- **Body**（Why）：說明「為什麼」需要這個變更——問題的背景、動機、與變更前行為的對比。不要重複 diff 已能看到的內容
+- **Footer**：中間 commit 使用 `Refs #NNN`，最終 commit 使用 `Closes #NNN`
+- Subject、Body、Footer 之間各隔一行空行
+- 若有「額外修正（既有問題）」，以獨立 commit 提交
+
+---
+
 ### Phase 0: 初始化與重入偵測
 
 0. **記錄開始時間**
@@ -51,8 +76,8 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
    |---------|--------|
    | 無 feature branch、無 spec | 從頭開始（Phase 1） |
    | 有 branch + spec，但無 OpenSpec change | 讀取 Issue comments 取得釐清結果 → Phase 1 步驟 5（Spec 審查） |
-   | 有 branch + spec + OpenSpec change（tasks 未完成）| Phase 2 步驟 2（apply） |
-   | 有 branch + spec + OpenSpec change（tasks 全完成）| Phase 2 步驟 3（verify） |
+   | 有 branch + spec + OpenSpec change（tasks 未完成）| Phase 2 步驟 12（apply） |
+   | 有 branch + spec + OpenSpec change（tasks 全完成）| Phase 2 步驟 13（verify） |
    | 已有 Draft PR | 回報「Issue #NNN 已有 Draft PR，中止」 |
 
    **重入時讀取釐清結果**：解析 Issue comments，找出先前由本 Skill 留下的「自動處理中止」留言，以及後續 assignee 的回覆，作為 spec 更新的輸入。
@@ -155,16 +180,20 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
     Agent 完成後，讀取回傳結果確認 artifacts 已建立，**立即繼續步驟 11**。
 
-11. **OpenSpec apply**
+11. **Git Commit（需求分析產物）**
+
+    將 SA spec 與 OpenSpec propose 產物提交，固定需求分析階段的產出。依「Commit Message Convention」提交。**立即繼續步驟 12**。
+
+12. **OpenSpec apply**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `opsx:apply`，參數為 change name `<change-name>`。
     > 遵循 TDD 流程（Red → Green → Refactor）實作所有 tasks。
     > 後端必須撰寫測試（單元 + 整合），前端不撰寫測試。
 
-    Agent 完成後，讀取回傳結果確認所有 tasks 已完成，**立即繼續步驟 12**。
+    Agent 完成後，讀取回傳結果確認所有 tasks 已完成，**立即繼續步驟 13**。
 
-12. **OpenSpec verify**
+13. **OpenSpec verify**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `opsx:verify`，參數為 change name `<change-name>`。
@@ -172,13 +201,17 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     > 回傳驗證報告。
 
     若回傳結果包含 CRITICAL issues → 在主流程中修復，再次用 Agent 執行 verify，直到全部通過。
-    通過後**立即繼續 Phase 3**。
+    通過後**立即繼續步驟 14**。
+
+14. **Git Commit（實作產物）**
+
+    將 apply 實作的所有程式碼變更提交，與後續審查修正分開。依「Commit Message Convention」提交。**立即繼續 Phase 3**。
 
 ---
 
 ### Phase 3: 品質審查
 
-13. **Code Review（平行 subagent）**
+15. **Code Review（平行 subagent）**
 
     使用 Agent tool 同時啟動三個 subagent：
     - `pr-review-toolkit:code-reviewer` — 程式碼品質、邏輯錯誤、安全漏洞
@@ -199,7 +232,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     | 判斷條件 | 處理方式 |
     |---------|---------|
     | **不需討論**：修正方式明確、風險低、不涉及架構決策（如：缺少 try-catch、缺少 console.warn、空 catch block） | 直接修正，與主要變更合併 commit |
-    | **可直接修正**：雖涉及較大變更，但確認 (1) 不影響 `sa/spec/NNN-xxx/spec.md` 定義的需求規格，且 (2) 無其他 GH Issue 列管 | 直接修正，**獨立 commit**（`fix:` 或 `refactor:`），並列入 PR body「額外修正」區塊 |
+    | **可直接修正**：雖涉及較大變更，但確認 (1) 不影響 `sa/spec/NNN-xxx/spec.md` 定義的需求規格，且 (2) 無其他 GH Issue 列管 | 直接修正，依「Commit Message Convention」以**獨立 commit** 提交，並列入 PR body「額外修正」區塊 |
     | **需要討論**：修正會改變 SA spec 定義的需求規格、需求不明確、或影響範圍無法自行判定 | 在 GH Issue 上留言通知 assignees 與 author，格式見下方 |
 
     **既有問題分流判定流程**：
@@ -242,20 +275,24 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     )"
     ```
 
-14. **Code Simplify**
+16. **Code Simplify**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `simplify`。
     > 審查本次變更的所有程式碼，參照 `sa/spec/NNN-xxx/spec.md` 與 OpenSpec change 目錄作為需求規格。
 
     Agent 完成後，讀取回傳結果。若有修正建議，在主流程中處理。
-    **立即繼續 Phase 4**。
+    **立即繼續步驟 17**。
+
+17. **Git Commit（審查修正）**
+
+    將 Code Review 與 Code Simplify 的修正提交。依「Commit Message Convention」提交。若無任何審查修正，跳過此 commit。**立即繼續 Phase 4**。
 
 ---
 
 ### Phase 4: E2E 測試與收尾
 
-15. **E2E 測試**
+18. **E2E 測試**
 
     1. 撰寫 `sa/spec/NNN-xxx/e2e.md`（E2E 測試腳本）
     2. 啟動後端與前端開發伺服器（使用 Bash tool 的 `run_in_background: true`），等待就緒後執行測試
@@ -265,39 +302,20 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
     - 若有 Chrome DevTools MCP → 使用瀏覽器自動化執行 UI 測試
     - 若無 → 透過 API 直接呼叫 + 原始碼確認驗證，並在 `e2e.md` 註明驗證方式
 
-16. **OpenSpec archive**
+19. **OpenSpec archive**
 
     使用 **Agent tool**（general-purpose）執行：
     > 使用 Skill tool 調用 `opsx:archive`，參數為 change name `<change-name>`。
     > 歸檔變更並同步 delta specs 至 main specs。
     > 遇到確認提示時一律選擇「同步並歸檔」。
 
-    Agent 完成後，讀取回傳結果確認歸檔完成，**立即繼續步驟 17**。
+    Agent 完成後，讀取回傳結果確認歸檔完成，**立即繼續步驟 20**。
 
-17. **Git Commit**
+20. **Git Commit（最終提交）**
 
-    將所有變更提交。Commit message **必須包含 subject + body + footer**，格式如下：
+    將剩餘變更（E2E 測試、OpenSpec 歸檔等）提交。依「Commit Message Convention」提交，Footer 使用 `Closes #NNN`。
 
-    ```bash
-    git add <相關檔案>
-    git commit -m "$(cat <<'EOF'
-    <type>: <繁體中文描述> (#NNN)
-
-    <Why — 說明變更動機與背景>
-
-    Closes #NNN
-    EOF
-    )"
-    ```
-
-    **規則**：
-    - **Subject**（What）：遵循 Conventional Commits（`feat:` / `fix:` / `refactor:` / `docs:` 等），繁體中文描述，結尾附 `(#NNN)`
-    - **Body**（Why）：說明「為什麼」需要這個變更——問題的背景、動機、與變更前行為的對比。不要重複 diff 已能看到的內容（改了哪些檔案、加了哪些程式碼）
-    - **Footer**：`Closes #NNN` 關聯 Issue
-    - Subject、Body、Footer 之間各隔一行空行
-    - 若有「額外修正（既有問題）」，以獨立 commit 提交，subject 使用對應的 type
-
-18. **開 Draft PR**
+21. **開 Draft PR**
 
     ```bash
     gh pr create --draft --base dev \
@@ -337,15 +355,15 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Bash(mkdir *:*), Bash(gradle *:*), B
 
     顯示 PR URL。
 
-19. **清場**
+22. **清場**
 
     關閉流程中啟動的所有資源：
-    1. 以 `pkill` 終止步驟 15 啟動的後端（`bootRun`）與前端（`vite`）dev server
+    1. 以 `pkill` 終止步驟 18 啟動的後端（`bootRun`）與前端（`vite`）dev server
     2. 若有 Chrome DevTools MCP 開啟的瀏覽器實例，一併關閉
     3. **等待背景任務通知到達**：`pkill` 後會收到 `run_in_background` 的 task-notification（status=failed），這是主動終止的預期行為。**必須在 skill 流程內收到並確認這些通知**，不可在通知到達前就結束流程，否則通知會漏到 skill 結束後，造成使用者困惑。
     4. 切回原始 branch：`git checkout $ORIGINAL_BRANCH`
 
-20. **完成回報**
+23. **完成回報**
 
     計算並顯示總執行時間：
     ```bash
