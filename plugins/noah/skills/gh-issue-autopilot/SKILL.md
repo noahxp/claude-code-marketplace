@@ -59,7 +59,9 @@ EOF
    gh issue view $ARGUMENTS --json title,body,assignees,labels,comments,author
    ```
 
-   提取：title、body（需求內容）、assignees（用於 tag）、author（Issue 建立者，用於 tag）、comments（用於重入時讀取釐清結果）。
+   提取：title、body（需求內容）、assignees（用於 tag）、author（Issue 建立者，用於 tag）、comments（補充與定案）。
+
+   **需求來源優先順序**：Issue body 為原始需求，comments 為補充與定案。若 body 與 comments 有衝突，以 comments 為準。
 
 2. **推導命名**
 

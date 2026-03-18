@@ -8,6 +8,9 @@ Noah 的個人 Claude Code Plugin Marketplace。
 |--------|------|------|
 | [noah:pr-review](./plugins/noah/skills/pr-review) | 分析 GitHub PR diff 並透過 GitHub API 發布 inline review comments | 1.0.0 |
 | [noah:gh-issue-autopilot](./plugins/noah/skills/gh-issue-autopilot) | 從 GitHub Issue 一貫執行到 Draft PR（含 spec 撰寫、審查、OpenSpec 工作流、review、e2e、歸檔） | 1.0.0 |
+| [noah:gh-issue-scan](./plugins/noah/skills/gh-issue-scan) | 搜尋 open 且未指派的 GitHub Issue，分析並篩選出可直接交由 gh-issue-autopilot 處理的 Issue | 1.1.0 |
+| [noah:gh-issue-triage](./plugins/noah/skills/gh-issue-triage) | 研究 GitHub Issue，評估是否可直接執行 gh-issue-autopilot | 1.1.0 |
+| [noah:gh-issue-e2e-test](./plugins/noah/skills/gh-issue-e2e-test) | 使用 Chrome DevTools 執行 E2E 測試，結果整理為 PR Comment 格式 | 1.1.0 |
 
 ## 安裝方式
 
