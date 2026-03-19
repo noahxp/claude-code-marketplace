@@ -33,7 +33,7 @@ claude-code-marketplace/
 | 項目 | 規則 | 範例 |
 |------|------|------|
 | Plugin 目錄名 | kebab-case（或專案代號） | `noah` |
-| Skill 目錄名 | kebab-case | `gh-issue-autopilot`、`pr-review` |
+| Skill 目錄名 | kebab-case | `gh-issue-opsx-autopilot`、`pr-review` |
 | `marketplace.json` 的 `source` | 相對路徑 `./plugins/<name>` | `./plugins/noah` |
 | Plugin name 一致性 | 目錄名 = `plugin.json` 的 `name` = `marketplace.json` 內的 `name` | 三處皆為 `noah` |
 
@@ -117,7 +117,7 @@ allowed-tools: <逗號分隔的工具清單>
 
 | 變更範圍 | scope | 範例 |
 |----------|-------|------|
-| 特定 plugin | plugin 名稱 | `feat: 新增 gh-issue-autopilot 流程` |
+| 特定 plugin | plugin 名稱 | `feat: 新增 gh-issue-opsx-autopilot 流程` |
 | marketplace.json 或跨 plugin | `marketplace` | `feat(marketplace): 新增 noah 插件註冊` |
 | 專案層級設定 | 省略或自訂 | `chore: 更新 CLAUDE.md` |
 

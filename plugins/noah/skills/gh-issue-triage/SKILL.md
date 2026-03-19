@@ -1,14 +1,14 @@
 ---
 name: gh-issue-triage
-description: 研究 GitHub Issue，評估是否可直接執行 gh-issue-autopilot
+description: 研究 GitHub Issue，評估是否可直接執行 gh-issue-opsx-autopilot
 allowed-tools: Bash(gh *:*), Bash(git *:*), Read, Grep, Glob
 ---
 
 # GH Issue Triage
 
-評估 GitHub Issue 是否適合由 `gh-issue-autopilot` 自動化處理，輸出結構化檢核報告。
+評估 GitHub Issue 是否適合由 `gh-issue-opsx-autopilot` 自動化處理，輸出結構化檢核報告。
 
-**輸入**：`$ARGUMENTS` = GitHub Issue 編號（如 `38`）
+**輸入**：`$ARGUMENTS` = GitHub Issue 編號（如 `100`）
 
 ---
 
@@ -108,7 +108,7 @@ gh issue view $ARGUMENTS --json title,body,assignees,labels,comments,author
 
 | 結論 | 含義 | 建議動作 |
 |------|------|---------|
-| ✅ 可直接執行 | 五項檢核皆無阻礙 | 執行 `/noah:gh-issue-autopilot $ARGUMENTS` |
+| ✅ 可直接執行 | 五項檢核皆無阻礙 | 執行 `/noah:gh-issue-opsx-autopilot $ARGUMENTS` |
 | ⚠️ 建議先處理 | 有可排除的障礙 | 處理完障礙後再執行 autopilot |
 | ❌ 不建議自動化 | 存在根本性障礙 | 需人工介入處理或重新定義需求 |
 

@@ -1,12 +1,12 @@
 ---
 name: gh-issue-scan
-description: 搜尋 open 且未指派的 GitHub Issue，分析並篩選出可直接交由 /gh-issue-autopilot 處理的 Issue
+description: 搜尋 open 且未指派的 GitHub Issue，分析並篩選出可直接交由 /gh-issue-opsx-autopilot 處理的 Issue
 allowed-tools: Bash(gh *:*), Bash(git *:*), Read, Grep, Glob, Agent
 ---
 
 # GH Issue Scan
 
-搜尋 open 且未指派的 GitHub Issue，深入分析每張 Issue 與現有程式碼、規格文件的關係，篩選出可直接交由 `/noah:gh-issue-autopilot` 處理的 Issue，列出原因與建議處理順序。
+搜尋 open 且未指派的 GitHub Issue，深入分析每張 Issue 與現有程式碼、規格文件的關係，篩選出可直接交由 `/noah:gh-issue-opsx-autopilot` 處理的 Issue，列出原因與建議處理順序。
 
 **輸入**：`$ARGUMENTS`（選填，可傳入額外篩選條件如 label）
 
@@ -19,7 +19,7 @@ allowed-tools: Bash(gh *:*), Bash(git *:*), Read, Grep, Glob, Agent
 ### 步驟 1：了解專案脈絡
 
 1. 讀取專案根目錄的 `CLAUDE.md`，掌握專案結構、開發規範與目錄慣例
-2. 讀取 `/noah:gh-issue-autopilot` 的 SKILL.md，掌握 autopilot 的能力範圍與把關條件（尤其「把關點 0：Issue 健康度檢核」的五項標準）
+2. 讀取 `/noah:gh-issue-opsx-autopilot` 的 SKILL.md，掌握 autopilot 的能力範圍與把關條件（尤其「把關點 0：Issue 健康度檢核」的五項標準）
 
 ### 步驟 2：搜尋候選 Issue
 
@@ -41,7 +41,7 @@ gh issue list --state open --assignee "" --json number,title,body,labels,comment
    - 讀取相關的 SA spec（`sa/spec/`）與 OpenSpec specs（`openspec/specs/`）
    - 評估變更範圍是否可控（跨模組程度、架構影響）
 5. **前置相依**：是否有相依 Issue 未完成，或與其他進行中的工作衝突
-6. **autopilot 適合度**：根據 `gh-issue-autopilot` 把關點 0 的五項標準綜合判定
+6. **autopilot 適合度**：根據 `gh-issue-opsx-autopilot` 把關點 0 的五項標準綜合判定
 
 ### 步驟 4：分類與排序
 
@@ -66,7 +66,7 @@ gh issue list --state open --assignee "" --json number,title,body,labels,comment
 - **可直接處理原因**：<具體說明為何符合 autopilot 條件>
 - **影響範圍**：<涉及的模組/檔案概述>
 - **預估複雜度**：低 / 中
-- **執行指令**：`/noah:gh-issue-autopilot NNN`
+- **執行指令**：`/noah:gh-issue-opsx-autopilot NNN`
 
 #### 2. #NNN — Issue 標題
 ...
