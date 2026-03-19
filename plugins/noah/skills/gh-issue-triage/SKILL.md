@@ -22,6 +22,10 @@ gh issue view $ARGUMENTS --json title,body,assignees,labels,comments,author
 
 提取 title、body、labels、comments。
 
+**需求來源優先順序**：Issue body 為原始需求，comments 為補充與定案。若 body 與 comments 有衝突，以 comments 為準。
+
+**既有分析去重**：檢查 comments 中是否已有 triage 報告或技術分析。若已有，以該分析為基礎，僅驗證其結論在當前程式碼狀態下是否仍成立，避免重複分析。
+
 若 Issue 帶有 `discussion` 標籤，**立即中止**並回報：
 > Issue #$ARGUMENTS 標記為 `discussion`，尚待團隊討論，不適合進入自動化流程。
 

@@ -111,6 +111,18 @@ allowed-tools: <逗號分隔的工具清單>
 
 ---
 
+## 版號管理規則
+
+當任何 plugin 內容變更需升版時，以下三處版號必須同步更新：
+
+1. `plugins/<plugin-name>/.claude-plugin/plugin.json` 的 `version`
+2. `.claude-plugin/marketplace.json` 對應 plugin 的 `version`
+3. `README.md` 可用 Plugins 表格中對應 plugin 的版本欄位
+
+三處版號必須一致，缺一不可。
+
+---
+
 ## Git Commit Scope 慣例
 
 遵循 Conventional Commits，scope 規則：
