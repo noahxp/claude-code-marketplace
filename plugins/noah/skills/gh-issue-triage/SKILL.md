@@ -1,6 +1,7 @@
 ---
 name: gh-issue-triage
 description: 八維度分析 GitHub Issue，評估是否可直接執行 gh-issue-opsx-autopilot
+model: opus
 allowed-tools: Bash(gh *:*), Bash(git *:*), Read, Grep, Glob
 ---
 
