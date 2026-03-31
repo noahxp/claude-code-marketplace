@@ -14,7 +14,7 @@
       },
       "source": "./plugins/noah",
       "category": "Development",
-      "version": "2.2.0",
+      "version": "2.2.1",
       "tags": ["noah", "gh-issue-opsx-autopilot", "pr-review", "gh-issue-scan", "gh-issue-triage", "gh-issue-e2e-test", "workflow", "automation"]
     }
   ]
