@@ -8,14 +8,14 @@
   "plugins": [
     {
       "name": "noah",
-      "description": "Noah 的個人開發工具集：含 GitHub Issue 自動化工作流與 PR Review",
+      "description": "Noah 的個人開發工具集：含 GitHub Issue 自動化工作流、PR Review 與 Agent 設計指南",
       "author": {
         "name": "Noah"
       },
       "source": "./plugins/noah",
       "category": "Development",
-      "version": "2.3.0",
-      "tags": ["noah", "gh-issue-opsx-autopilot", "pr-review", "gh-issue-scan", "gh-issue-triage", "gh-issue-e2e-test", "ai-perf-record", "workflow", "automation"]
+      "version": "2.4.0",
+      "tags": ["noah", "gh-issue-opsx-autopilot", "pr-review", "gh-issue-scan", "gh-issue-triage", "gh-issue-e2e-test", "ai-perf-record", "agent-design", "workflow", "automation"]
     }
   ]
 }
