@@ -1,11 +1,11 @@
 ---
-name: visual-companion
-description: Browser-based live HTML preview companion. Use when the user wants an interactive web view to preview mockups, diagrams, rendered Markdown, layout comparisons, or any HTML content. Spins up a local HTTP server that watches a directory and auto-serves the newest HTML file, with optional click-to-select interactivity for side-by-side options.
+name: visual-preview
+description: Browser-based live HTML preview. Use when the user wants an interactive web view to preview mockups, diagrams, rendered Markdown, layout comparisons, or any HTML content. Spins up a local HTTP server that watches a directory and auto-serves the newest HTML file, with optional click-to-select interactivity for side-by-side options.
 ---
 
-# Visual Companion Guide
+# Visual Preview Guide
 
-Browser-based visual companion for showing mockups, diagrams, rendered documents, and option comparisons in real time.
+Browser-based visual preview for showing mockups, diagrams, rendered documents, and option comparisons in real time.
 
 ## When to Use
 
@@ -43,15 +43,15 @@ The server watches a directory for HTML files and serves the newest one to the b
 scripts/start-server.sh --project-dir /path/to/project
 
 # Returns: {"type":"server-started","port":52341,"url":"http://localhost:52341",
-#           "screen_dir":"/path/to/project/.superpowers/brainstorm/12345-1706000000/content",
-#           "state_dir":"/path/to/project/.superpowers/brainstorm/12345-1706000000/state"}
+#           "screen_dir":"/path/to/project/.superpowers/visual-preview/12345-1706000000/content",
+#           "state_dir":"/path/to/project/.superpowers/visual-preview/12345-1706000000/state"}
 ```
 
 Save `screen_dir` and `state_dir` from the response. Tell user to open the URL.
 
-**Finding connection info:** The server writes its startup JSON to `$STATE_DIR/server-info`. If you launched the server in the background and didn't capture stdout, read that file to get the URL and port. When using `--project-dir`, check `<project>/.superpowers/brainstorm/` for the session directory.
+**Finding connection info:** The server writes its startup JSON to `$STATE_DIR/server-info`. If you launched the server in the background and didn't capture stdout, read that file to get the URL and port. When using `--project-dir`, check `<project>/.superpowers/visual-preview/` for the session directory.
 
-**Note:** Pass the project root as `--project-dir` so files persist in `.superpowers/brainstorm/` and survive server restarts. Without it, files go to `/tmp` and get cleaned up. Remind the user to add `.superpowers/` to `.gitignore` if it's not already there.
+**Note:** Pass the project root as `--project-dir` so files persist in `.superpowers/visual-preview/` and survive server restarts. Without it, files go to `/tmp` and get cleaned up. Remind the user to add `.superpowers/` to `.gitignore` if it's not already there.
 
 **Launching the server by platform:**
 
@@ -285,7 +285,7 @@ If `$STATE_DIR/events` doesn't exist, the user didn't interact with the browser 
 scripts/stop-server.sh $SESSION_DIR
 ```
 
-If the session used `--project-dir`, files persist in `.superpowers/brainstorm/` for later reference. Only `/tmp` sessions get deleted on stop.
+If the session used `--project-dir`, files persist in `.superpowers/visual-preview/` for later reference. Only `/tmp` sessions get deleted on stop.
 
 ## Reference
 

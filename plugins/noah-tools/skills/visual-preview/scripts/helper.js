@@ -79,7 +79,7 @@
   };
 
   // Expose API for explicit use
-  window.brainstorm = {
+  window.visualPreview = {
     send: sendEvent,
     choice: (value, metadata = {}) => sendEvent({ type: 'choice', value, ...metadata })
   };

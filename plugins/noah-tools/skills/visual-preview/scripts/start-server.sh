@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Start the brainstorm server and output connection info
+# Start the visual-preview server and output connection info
 # Usage: start-server.sh [--project-dir <path>] [--host <bind-host>] [--url-host <display-host>] [--foreground] [--background]
 #
 # Starts server on a random high port, outputs JSON with URL.
 # Each session gets its own directory to avoid conflicts.
 #
 # Options:
-#   --project-dir <path>  Store session files under <path>/.superpowers/brainstorm/
+#   --project-dir <path>  Store session files under <path>/.superpowers/visual-preview/
 #                         instead of /tmp. Files persist after server stops.
 #   --host <bind-host>    Host/interface to bind (default: 127.0.0.1).
 #                         Use 0.0.0.0 in remote/containerized environments.
@@ -78,9 +78,9 @@ fi
 SESSION_ID="$$-$(date +%s)"
 
 if [[ -n "$PROJECT_DIR" ]]; then
-  SESSION_DIR="${PROJECT_DIR}/.superpowers/brainstorm/${SESSION_ID}"
+  SESSION_DIR="${PROJECT_DIR}/.superpowers/visual-preview/${SESSION_ID}"
 else
-  SESSION_DIR="/tmp/brainstorm-${SESSION_ID}"
+  SESSION_DIR="/tmp/visual-preview-${SESSION_ID}"
 fi
 
 STATE_DIR="${SESSION_DIR}/state"
@@ -110,13 +110,13 @@ fi
 # Foreground mode for environments that reap detached/background processes.
 if [[ "$FOREGROUND" == "true" ]]; then
   echo "$$" > "$PID_FILE"
-  env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs
+  env VISUAL_PREVIEW_DIR="$SESSION_DIR" VISUAL_PREVIEW_HOST="$BIND_HOST" VISUAL_PREVIEW_URL_HOST="$URL_HOST" VISUAL_PREVIEW_OWNER_PID="$OWNER_PID" node server.cjs
   exit $?
 fi
 
 # Start server, capturing output to log file
 # Use nohup to survive shell exit; disown to remove from job table
-nohup env BRAINSTORM_DIR="$SESSION_DIR" BRAINSTORM_HOST="$BIND_HOST" BRAINSTORM_URL_HOST="$URL_HOST" BRAINSTORM_OWNER_PID="$OWNER_PID" node server.cjs > "$LOG_FILE" 2>&1 &
+nohup env VISUAL_PREVIEW_DIR="$SESSION_DIR" VISUAL_PREVIEW_HOST="$BIND_HOST" VISUAL_PREVIEW_URL_HOST="$URL_HOST" VISUAL_PREVIEW_OWNER_PID="$OWNER_PID" node server.cjs > "$LOG_FILE" 2>&1 &
 SERVER_PID=$!
 disown "$SERVER_PID" 2>/dev/null
 echo "$SERVER_PID" > "$PID_FILE"

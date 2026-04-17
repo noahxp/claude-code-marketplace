@@ -13,7 +13,7 @@ Noah 的個人 Claude Code Plugin Marketplace。
 | [noah:gh-issue-e2e-test](./plugins/noah/skills/gh-issue-e2e-test) | 使用 Chrome DevTools 執行 E2E 測試，結果整理為 PR Comment 格式 | 1.1.0 |
 | [noah:ai-perf-record](./plugins/noah/skills/ai-perf-record) | 透過 Chrome DevTools 自動填寫 AI 效率提升紀錄表單 | 2.3.0 |
 | [noah:agent-design](./plugins/noah/skills/agent-design) | Agent 設計顧問：幫助 PM 判斷 Agent 類型、理解架構設計、產出需求規格 | 2.4.0 |
-| [noah-tools:visual-companion](./plugins/noah-tools/skills/visual-companion) | 瀏覽器即時預覽 companion：啟動本地 HTTP server 監看目錄並自動渲染最新 HTML，支援點擊選取互動 | 1.0.0 |
+| [noah-tools:visual-preview](./plugins/noah-tools/skills/visual-preview) | 瀏覽器即時預覽：啟動本地 HTTP server 監看目錄並自動渲染最新 HTML，支援點擊選取互動 | 1.1.0 |
 
 ## 安裝方式
 

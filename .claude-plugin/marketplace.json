@@ -19,14 +19,14 @@
     },
     {
       "name": "noah-tools",
-      "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-companion）等。",
+      "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-preview）等。",
       "author": {
         "name": "Noah"
       },
       "source": "./plugins/noah-tools",
       "category": "Productivity",
-      "version": "1.0.0",
-      "tags": ["noah", "visual-companion", "preview", "html", "browser", "live-preview"]
+      "version": "1.1.0",
+      "tags": ["noah", "visual-preview", "preview", "html", "browser", "live-preview"]
     }
   ]
 }
