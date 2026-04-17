@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # Start the visual-preview server and output connection info
-# Usage: start-server.sh [--project-dir <path>] [--host <bind-host>] [--url-host <display-host>] [--foreground] [--background]
+# Usage: start-server.sh [--host <bind-host>] [--url-host <display-host>] [--foreground] [--background]
 #
 # Starts server on a random high port, outputs JSON with URL.
-# Each session gets its own directory to avoid conflicts.
+# Each session gets its own directory under /tmp/ to avoid conflicts.
+# Session files are ephemeral and cleaned up on stop.
 #
 # Options:
-#   --project-dir <path>  Store session files under <path>/.superpowers/visual-preview/
-#                         instead of /tmp. Files persist after server stops.
 #   --host <bind-host>    Host/interface to bind (default: 127.0.0.1).
 #                         Use 0.0.0.0 in remote/containerized environments.
 #   --url-host <host>     Hostname shown in returned URL JSON.
@@ -17,17 +16,12 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Parse arguments
-PROJECT_DIR=""
 FOREGROUND="false"
 FORCE_BACKGROUND="false"
 BIND_HOST="127.0.0.1"
 URL_HOST=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --project-dir)
-      PROJECT_DIR="$2"
-      shift 2
-      ;;
     --host)
       BIND_HOST="$2"
       shift 2
@@ -74,14 +68,9 @@ if [[ "$FOREGROUND" != "true" && "$FORCE_BACKGROUND" != "true" ]]; then
   fi
 fi
 
-# Generate unique session directory
+# Generate unique session directory under /tmp/
 SESSION_ID="$$-$(date +%s)"
-
-if [[ -n "$PROJECT_DIR" ]]; then
-  SESSION_DIR="${PROJECT_DIR}/.superpowers/visual-preview/${SESSION_ID}"
-else
-  SESSION_DIR="/tmp/visual-preview-${SESSION_ID}"
-fi
+SESSION_DIR="/tmp/visual-preview-${SESSION_ID}"
 
 STATE_DIR="${SESSION_DIR}/state"
 PID_FILE="${STATE_DIR}/server.pid"
@@ -134,7 +123,7 @@ for i in {1..50}; do
       sleep 0.1
     done
     if [[ "$alive" != "true" ]]; then
-      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal with: $SCRIPT_DIR/start-server.sh${PROJECT_DIR:+ --project-dir $PROJECT_DIR} --host $BIND_HOST --url-host $URL_HOST --foreground\"}"
+      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal with: $SCRIPT_DIR/start-server.sh --host $BIND_HOST --url-host $URL_HOST --foreground\"}"
       exit 1
     fi
     grep "server-started" "$LOG_FILE" | head -1

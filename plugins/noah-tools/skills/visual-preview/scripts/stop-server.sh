@@ -2,9 +2,8 @@
 # Stop the visual-preview server and clean up
 # Usage: stop-server.sh <session_dir>
 #
-# Kills the server process. Only deletes session directory if it's
-# under /tmp (ephemeral). Persistent directories (.superpowers/) are
-# kept so mockups can be reviewed later.
+# Kills the server process and removes the session directory under /tmp/.
+# As a safety guard, directories outside /tmp/ are left untouched.
 
 SESSION_DIR="$1"
 

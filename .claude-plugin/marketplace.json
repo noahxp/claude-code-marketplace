@@ -25,7 +25,7 @@
       },
       "source": "./plugins/noah-tools",
       "category": "Productivity",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "tags": ["noah", "visual-preview", "preview", "html", "browser", "live-preview"]
     }
   ]
