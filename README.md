@@ -14,6 +14,7 @@ Noah 的個人 Claude Code Plugin Marketplace。
 | [noah:ai-perf-record](./plugins/noah/skills/ai-perf-record) | 透過 Chrome DevTools 自動填寫 AI 效率提升紀錄表單 | 2.3.0 |
 | [noah:agent-design](./plugins/noah/skills/agent-design) | Agent 設計顧問：幫助 PM 判斷 Agent 類型、理解架構設計、產出需求規格 | 2.4.0 |
 | [noah-tools:visual-preview](./plugins/noah-tools/skills/visual-preview) | 瀏覽器即時預覽：啟動本地 HTTP server 監看目錄並自動渲染最新 HTML，支援點擊選取互動 | 1.2.0 |
+| [noah-spec:writing-spec](./plugins/noah-spec/skills/writing-spec) | Spec-driven development 收尾工作流：將實作成果凝練為 capability-grained canonical spec | 1.0.0 |
 
 ## 安裝方式
 

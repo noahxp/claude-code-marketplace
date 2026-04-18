@@ -27,6 +27,17 @@
       "category": "Productivity",
       "version": "1.2.0",
       "tags": ["noah", "visual-preview", "preview", "html", "browser", "live-preview"]
+    },
+    {
+      "name": "noah-spec",
+      "description": "Spec-driven development 收尾工作流：將實作成果凝練為 capability-grained canonical spec",
+      "author": {
+        "name": "Noah"
+      },
+      "source": "./plugins/noah-spec",
+      "category": "Development",
+      "version": "1.0.0",
+      "tags": ["noah-spec", "spec", "sdd", "canonical-spec", "workflow"]
     }
   ]
 }

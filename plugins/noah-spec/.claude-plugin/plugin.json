@@ -1,0 +1,8 @@
+{
+  "name": "noah-spec",
+  "description": "Spec-driven development 收尾工作流：將實作成果凝練為 capability-grained canonical spec",
+  "version": "1.0.0",
+  "author": {
+    "name": "Noah"
+  }
+}
