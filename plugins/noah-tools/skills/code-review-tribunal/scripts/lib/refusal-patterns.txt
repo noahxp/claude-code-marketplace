@@ -1,0 +1,20 @@
+# Code Review Tribunal — 拒答強訊號 patterns
+# 用途：health check 規則 A 的整段拒答偵測；由 codex.sh / gemini.sh 透過 grep -iEf 載入
+# 設計原則：
+#   - 僅匹配「整段拒答」強訊號，不匹配片段（如 "As an AI"、"恕我直言" 等合法 review 開頭）
+#   - 偵測範圍限縮於 cli 輸出的首 200 字元，避免審查正文內合法引用觸發誤判
+#   - 行內 `^[[:space:]]*` 允許可能的前導空白；patterns 與 SKILL.md 契約 #10 檢查 A 對齊（修改本檔須同步 SKILL.md）
+# 文字大小寫不敏感（caller 加 -i 旗標）
+#
+# 英文整段拒答訊號
+^[[:space:]]*I (cannot|am unable|am not able|will not|won't) (help|assist|comply|do this|provide|respond|continue|answer)
+^[[:space:]]*I'm (unable|not able) to (help|assist|comply|do|provide|respond|continue|answer)
+^[[:space:]]*I'm (afraid|sorry),? I (cannot|can't|am unable)
+^[[:space:]]*Sorry,? I (cannot|can't|am unable)
+^[[:space:]]*I apologize,? but I (cannot|can't|am unable)
+#
+# 繁中整段拒答訊號（須在句首；常見句型：「抱歉，我無法...」「對不起，我無法...」）
+^[[:space:]]*抱歉，?我(無法|沒辦法|不能)(執行|完成|處理|協助|回答|繼續|提供)
+^[[:space:]]*很抱歉，?我(無法|沒辦法|不能)(執行|完成|處理|協助|回答|繼續|提供)
+^[[:space:]]*對不起，?我(無法|沒辦法|不能)(執行|完成|處理|協助|回答|繼續|提供)
+^[[:space:]]*我無法(執行|完成|處理|協助|回答|繼續|提供)此(項|個)(任務|請求|工作|要求)
