@@ -2,7 +2,7 @@
 # Code Review Tribunal — codex cli 執行器
 # 子命令：preflight / r1 / r2 / r3
 # 設計重點：
-#   - 與 gemini.sh 介面對等；共用部分由 lib/common.sh 提供
+#   - 與 agy.sh 介面對等；共用部分由 lib/common.sh 提供
 #   - codex 在背景執行時必須 `< /dev/null` 阻斷 stdin 讀取，避免 hang
 #   - codex --json 配合 jq 抽 agent_message.text，避開 metadata 雜訊
 #   - 任一輪失敗即 die（含他方前輪檔缺失）；不再用 placeholder 替代繼續跑
@@ -14,6 +14,8 @@ set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
 
 # 共用：執行 codex 並用 jq 抽純訊息；含 schema drift 防護
+# 註：codex 不像 agy 會在 cwd 產生 cache 檔，故刻意不採 agy.sh 的 subshell `cd` 隔離；
+#     兩隻 script 的 cwd 行為不對等是有意為之，非遺漏。
 run_codex_call() {
   local prompt="$1" out="$2" err="$3"
   local raw="${out%.md}.raw.json"
@@ -129,7 +131,7 @@ cmd_r2() {
   local workdir="$1"
   [ -d "$workdir" ] || die "workdir 不存在: $workdir"
   # fail-fast:任一前一輪檔（含他方）缺失即中止;不再用 placeholder 替代
-  for f in round1-claude-code.md round1-codex-cli.md round1-gemini-cli.md; do
+  for f in round1-claude-code.md round1-codex-cli.md round1-agy-cli.md; do
     [ -s "$workdir/$f" ] || die "第二輪前置：$f 缺失或為空；請重試第一輪"
   done
 
@@ -142,22 +144,22 @@ cmd_r2() {
 請讀取以下三份檔案：
 - 你自己的第一輪：$workdir/round1-codex-cli.md
 - Claude Code 的第一輪：$workdir/round1-claude-code.md
-- gemini cli 的第一輪：$workdir/round1-gemini-cli.md
+- agy cli 的第一輪：$workdir/round1-agy-cli.md
 
-對 Claude Code 與 gemini cli 提出的每個論點，請逐點表態（三選一）：
-1. **同意並補強**:認同此論點並提供補充洞察
-2. **補充其未涵蓋的面向**:指出他們遺漏的關鍵點
-3. **謹慎質疑**:須附具體理由與替代方案
+對 Claude Code 與 agy cli 提出的每個論點，請逐點表態（三選一）：
+1. **同意並補強**：認同此論點並提供補充洞察
+2. **補充其未涵蓋的面向**：指出他們遺漏的關鍵點
+3. **謹慎質疑**：須附具體理由與替代方案
 
-語氣：互相完善,非辯駁勝負。
+語氣：互相完善，非辯駁勝負。
 
 輸出格式：
 
 ## 對 Claude Code 的回應
 - [Claude Code 的論點摘要]: **[同意並補強 / 補充 / 謹慎質疑]** — 內容
 
-## 對 gemini cli 的回應
-- [gemini cli 的論點摘要]: **[...]** — 內容
+## 對 agy cli 的回應
+- [agy cli 的論點摘要]: **[...]** — 內容
 
 ## 我自己的補充
 - 任何在第一輪未充分表達的補強
@@ -182,8 +184,8 @@ cmd_r3() {
   local workdir="$1"
   [ -d "$workdir" ] || die "workdir 不存在: $workdir"
   # fail-fast:任一前兩輪檔（含他方）缺失即中止
-  for f in round1-claude-code.md round1-codex-cli.md round1-gemini-cli.md \
-           round2-claude-code.md round2-codex-cli.md round2-gemini-cli.md; do
+  for f in round1-claude-code.md round1-codex-cli.md round1-agy-cli.md \
+           round2-claude-code.md round2-codex-cli.md round2-agy-cli.md; do
     [ -s "$workdir/$f" ] || die "第三輪前置：$f 缺失或為空；請重試前一輪"
   done
 
@@ -196,8 +198,8 @@ cmd_r3() {
 [資訊可達性] 本輪由三方平行啟動，你只能讀到三方 round1 + 三方 round2，**不會看到任何方 round3**。最終共識與仲裁由 host 在 Stage 5 執行；你的共識度 tag 僅為基於 round1 / round2 的個人估計。
 
 請讀取所有前兩輪輸出（共六份）：
-- round1：$workdir/round1-claude-code.md、$workdir/round1-codex-cli.md、$workdir/round1-gemini-cli.md
-- round2：$workdir/round2-claude-code.md、$workdir/round2-codex-cli.md、$workdir/round2-gemini-cli.md
+- round1：$workdir/round1-claude-code.md、$workdir/round1-codex-cli.md、$workdir/round1-agy-cli.md
+- round2：$workdir/round2-claude-code.md、$workdir/round2-codex-cli.md、$workdir/round2-agy-cli.md
 
 第三輪原則：
 1. 預設不新增 Critical 議題；主要任務是對前兩輪議題表態收斂並標註共識度
@@ -209,7 +211,7 @@ cmd_r3() {
 
 ## Critical Issues（最終定稿）
 - **[Unanimous]** 描述 [file:line] — 風險 — 修法建議：...
-- **[Majority: 我 + X]** 描述 [file:line] — 風險 — 修法建議：...（X 嚴格使用 \`Claude Code\` / \`gemini cli\` 之一）
+- **[Majority: 我 + X]** 描述 [file:line] — 風險 — 修法建議：...（X 嚴格使用 \`Claude Code\` / \`agy cli\` 之一）
 - **[NEW-CRITICAL]** 描述 [file:line] — 為何前兩輪未發現：... — 修法建議：...
 
 ## Important Issues

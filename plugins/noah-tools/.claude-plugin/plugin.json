@@ -1,7 +1,7 @@
 {
   "name": "noah-tools",
   "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-preview）、三方仲裁式 code review（code-review-tribunal）等。",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": {
     "name": "Noah"
   }

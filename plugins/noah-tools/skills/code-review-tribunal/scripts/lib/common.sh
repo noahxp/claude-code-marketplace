@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Code Review Tribunal — cli 端共用函式
-# 由 codex.sh / gemini.sh 透過 `source` 載入；不可直接執行
+# 由 codex.sh / agy.sh 透過 `source` 載入；不可直接執行
 # refusal-patterns.txt 與本檔同目錄（scripts/lib/），由 ${BASH_SOURCE[0]} 解析自身路徑
 
 [ "${BASH_SOURCE[0]}" = "${0}" ] \
-  && { echo "ERR: common.sh 應由 codex.sh / gemini.sh source 載入，不可直接執行" >&2; exit 1; }
+  && { echo "ERR: common.sh 應由 codex.sh / agy.sh source 載入，不可直接執行" >&2; exit 1; }
 
 die() { echo "ERR: $*" >&2; exit 1; }
 

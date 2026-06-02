@@ -1,5 +1,5 @@
 # Code Review Tribunal — 拒答強訊號 patterns
-# 用途：health check 規則 A 的整段拒答偵測；由 codex.sh / gemini.sh 透過 grep -iEf 載入
+# 用途：health check 規則 A 的整段拒答偵測；由 codex.sh / agy.sh 透過 grep -iEf 載入
 # 設計原則：
 #   - 僅匹配「整段拒答」強訊號，不匹配片段（如 "As an AI"、"恕我直言" 等合法 review 開頭）
 #   - 偵測範圍限縮於 cli 輸出的首 200 字元，避免審查正文內合法引用觸發誤判
