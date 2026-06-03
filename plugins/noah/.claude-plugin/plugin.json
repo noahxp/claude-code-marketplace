@@ -1,7 +1,7 @@
 {
   "name": "noah",
   "description": "Noah 的個人開發工具集：含 GitHub Issue 自動化工作流、PR Review 與 Agent 設計指南",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "author": {
     "name": "Noah"
   }
