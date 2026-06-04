@@ -8,14 +8,14 @@
   "plugins": [
     {
       "name": "noah",
-      "description": "Noah 的個人開發工具集：含 GitHub Issue 自動化工作流、PR Review 與 Agent 設計指南",
+      "description": "Noah 的個人開發工具集：含 GitHub Issue 自動化工作流與 Agent 設計指南",
       "author": {
         "name": "Noah"
       },
       "source": "./plugins/noah",
       "category": "Development",
-      "version": "2.5.0",
-      "tags": ["noah", "gh-issue-opsx-autopilot", "pr-review", "gh-issue-scan", "gh-issue-triage", "gh-issue-e2e-test", "ai-perf-record", "agent-design", "workflow", "automation"]
+      "version": "2.6.0",
+      "tags": ["noah", "gh-issue-opsx-autopilot", "gh-issue-scan", "gh-issue-triage", "gh-issue-e2e-test", "ai-perf-record", "agent-design", "workflow", "automation"]
     },
     {
       "name": "noah-tools",
@@ -27,17 +27,6 @@
       "category": "Productivity",
       "version": "1.4.0",
       "tags": ["noah", "visual-preview", "preview", "html", "browser", "live-preview", "code-review-tribunal", "code-review", "multi-model", "codex", "agy", "antigravity"]
-    },
-    {
-      "name": "noah-spec",
-      "description": "Spec-driven development 收尾工作流：將實作成果凝練為 capability-grained canonical spec",
-      "author": {
-        "name": "Noah"
-      },
-      "source": "./plugins/noah-spec",
-      "category": "Development",
-      "version": "1.0.0",
-      "tags": ["noah-spec", "spec", "sdd", "canonical-spec", "workflow"]
     }
   ]
 }

@@ -33,7 +33,7 @@ claude-code-marketplace/
 | 項目 | 規則 | 範例 |
 |------|------|------|
 | Plugin 目錄名 | kebab-case（或專案代號） | `noah` |
-| Skill 目錄名 | kebab-case | `gh-issue-opsx-autopilot`、`pr-review` |
+| Skill 目錄名 | kebab-case | `gh-issue-opsx-autopilot`、`agent-design` |
 | `marketplace.json` 的 `source` | 相對路徑 `./plugins/<name>` | `./plugins/noah` |
 | Plugin name 一致性 | 目錄名 = `plugin.json` 的 `name` = `marketplace.json` 內的 `name` | 三處皆為 `noah` |
 
