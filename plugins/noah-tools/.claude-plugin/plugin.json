@@ -1,7 +1,7 @@
 {
   "name": "noah-tools",
-  "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-preview）、三方仲裁式 code review（code-review-tribunal）等。",
-  "version": "1.4.0",
+  "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-preview）、三方仲裁式 code review（code-review-tribunal）、PR merge message 擬稿（pr-merge-message-draft）等。",
+  "version": "1.5.0",
   "author": {
     "name": "Noah"
   }
