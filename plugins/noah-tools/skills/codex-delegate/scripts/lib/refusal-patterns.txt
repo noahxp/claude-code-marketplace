@@ -1,0 +1,21 @@
+# Codex Delegate — 拒答強訊號 patterns
+# 用途：health check 規則 A 的整段拒答偵測；由 codex.sh 透過 grep -iEf 載入
+# 設計原則：
+#   - 僅匹配「整段拒答」強訊號，不匹配片段（如 "As an AI"、"恕我直言" 等合法 review 開頭）
+#   - 偵測範圍限縮於 codex 輸出的首 200 字元，避免審查正文內合法引用觸發誤判
+#   - 行內前綴允許前導空白與 markdown bullet（`- ` / `* ` / `+ `）——codex 依四段格式輸出時，
+#     拒答會落在 `## 結論` 底下的 bullet 內，只比對行首會整段漏檢；patterns 與 SKILL.md 的 health check 規則 A 對齊（修改本檔須同步 SKILL.md）
+# 文字大小寫不敏感（caller 加 -i 旗標）
+#
+# 英文整段拒答訊號
+^[[:space:]]*([-*+][[:space:]]+)?I (cannot|am unable|am not able|will not|won't) (help|assist|comply|do this|provide|respond|continue|answer)
+^[[:space:]]*([-*+][[:space:]]+)?I'm (unable|not able) to (help|assist|comply|do|provide|respond|continue|answer)
+^[[:space:]]*([-*+][[:space:]]+)?I'm (afraid|sorry),? I (cannot|can't|am unable)
+^[[:space:]]*([-*+][[:space:]]+)?Sorry,? I (cannot|can't|am unable)
+^[[:space:]]*([-*+][[:space:]]+)?I apologize,? but I (cannot|can't|am unable)
+#
+# 繁中整段拒答訊號（須在句首；常見句型：「抱歉，我無法...」「對不起，我無法...」）
+^[[:space:]]*([-*+][[:space:]]+)?抱歉，?我(無法|沒辦法|不能)(執行|完成|處理|協助|回答|繼續|提供)
+^[[:space:]]*([-*+][[:space:]]+)?很抱歉，?我(無法|沒辦法|不能)(執行|完成|處理|協助|回答|繼續|提供)
+^[[:space:]]*([-*+][[:space:]]+)?對不起，?我(無法|沒辦法|不能)(執行|完成|處理|協助|回答|繼續|提供)
+^[[:space:]]*([-*+][[:space:]]+)?我無法(執行|完成|處理|協助|回答|繼續|提供)此(項|個)(任務|請求|工作|要求)

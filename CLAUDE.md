@@ -20,9 +20,16 @@ claude-code-marketplace/
 │       └── skills/
 │           └── <skill-name>/     # 每個 skill 一個目錄（kebab-case）
 │               └── SKILL.md      # Skill 定義（YAML frontmatter + Markdown body）
+├── tests/                        # skill script 的回歸測試（不隨 plugin 分發）
+│   ├── run-all.sh
+│   └── <skill-name>/
 ├── CLAUDE.md
 └── README.md
 ```
+
+**`tests/` 為何在根層而非 `plugins/` 底下**：`marketplace.json` 的 `source` 指向整個
+`./plugins/<name>`，放在那裡的檔案會隨 plugin 安裝到每位使用者機器上。測試只對維護者有意義，
+不該進入分發物——`plugins/` 底下因此維持「JSON metadata、Markdown 定義與 runtime script」三者。
 
 **重點**：`.claude-plugin/` 資料夾僅放 `plugin.json`（或根層級的 `marketplace.json`），skills 放在 plugin root 下的 `skills/` 目錄。
 
