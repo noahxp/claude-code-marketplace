@@ -6,12 +6,7 @@ Noah 的個人 Claude Code Plugin Marketplace。
 
 | Plugin | 說明 | 版本 |
 |--------|------|------|
-| [noah:gh-issue-opsx-autopilot](./plugins/noah/skills/gh-issue-opsx-autopilot) | 從 GitHub Issue 一貫執行到 Draft PR（含八維度 spec 撰寫、品質把關、實作、review、測試、收尾） | 2.2.1 |
-| [noah:gh-issue-scan](./plugins/noah/skills/gh-issue-scan) | 搜尋 open 且未指派的 GitHub Issue，分析並篩選出可直接交由 gh-issue-opsx-autopilot 處理的 Issue | 1.1.0 |
-| [noah:gh-issue-triage](./plugins/noah/skills/gh-issue-triage) | 八維度分析 GitHub Issue，評估是否可直接執行 gh-issue-opsx-autopilot | 2.1.0 |
-| [noah:gh-issue-e2e-test](./plugins/noah/skills/gh-issue-e2e-test) | 使用 Chrome DevTools 執行 E2E 測試，結果整理為 PR Comment 格式 | 1.1.0 |
 | [noah:ai-perf-record](./plugins/noah/skills/ai-perf-record) | 透過 Chrome DevTools 自動填寫 AI 效率提升紀錄表單 | 2.4.0 |
-| [noah:agent-design](./plugins/noah/skills/agent-design) | Agent 設計顧問：幫助 PM 判斷 Agent 類型、理解架構設計、產出需求規格 | 2.4.0 |
 | [noah-tools:visual-preview](./plugins/noah-tools/skills/visual-preview) | 瀏覽器即時預覽：啟動本地 HTTP server 監看目錄並自動渲染最新 HTML，支援點擊選取互動 | 1.3.0 |
 | [noah-tools:code-review-tribunal](./plugins/noah-tools/skills/code-review-tribunal) | 三方仲裁式 code review：Claude Code、codex cli、agy cli 各自評審後互讀辯論三回合，Claude Code 依共識度仲裁產出最終定稿；含語意失敗 health check、NEW-CRITICAL 隔離、cli fail-fast；target 支援 PR / 路徑 / commit ref / git range / multi-ref / 自由文字 | 1.4.0 |
 | [noah-tools:pr-merge-message-draft](./plugins/noah-tools/skills/pr-merge-message-draft) | 為 PR 擬定 merge 用的 Commit Message（標題）與 Extended Description（內文）：英文 type/scope + 繁中精煉決策摘要，只摘「為何改 + 主要影響」、不照抄 PR description；含八道呈稿前自檢 gate；target 支援 PR 編號 / URL / 當前分支 / commit ref；僅輸出文字供確認後定稿 | 1.5.0 |
