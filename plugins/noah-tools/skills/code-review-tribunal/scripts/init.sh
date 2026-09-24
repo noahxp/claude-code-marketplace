@@ -52,7 +52,7 @@ elif [ -e "$TARGET_ARG" ]; then
       if [ -d "$TARGET_ARG" ]; then
         # 目錄 fallback：列出目錄下所有 tracked 檔案內容並串接
         # 先把檔案清單落到暫存檔再消費，避免 process substitution 吞掉 git ls-files 的 rc
-        # （process substitution 內 git ls-files rc 不受 set -e / pipefail 約束，rc≠0 時靜默產出空檔）
+        # （process substitution 內 git ls-files rc 不受 set -e / pipefail 約束，rc 非 0 時靜默產出空檔）
         FILES_LIST="$WORKDIR/_files-tracked.txt"
         git ls-files -- "$TARGET_ARG" > "$FILES_LIST"
         [ -s "$FILES_LIST" ] || { rm -f "$FILES_LIST"; die "tracked 目錄無檔案或 git ls-files 失敗: $TARGET_ARG"; }
@@ -111,7 +111,7 @@ elif git rev-parse --verify "$TARGET_ARG" >/dev/null 2>&1; then
 
 else
   # 自由文字：寫入 prompt 與機械可讀狀態
-  # 狀態欄位 STATUS: pending → host 在進入第二階段前用 Glob/Grep/Read 蒐集素材後 append 並改為 ready
+  # 狀態欄位初始為 STATUS: pending，host 在進入第二階段前用 Glob/Grep/Read 蒐集素材後 append 並改為 ready
   # cli 腳本第一輪會檢查 STATUS 必須為 ready，否則視為「素材未就緒」失敗
   cat > "$WORKDIR/target.md" <<EOF
 STATUS: pending

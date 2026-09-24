@@ -21,7 +21,7 @@ print_err_tail() {
 }
 
 # 報告結果（含語意失敗 health check）
-# 偵測順序：A（首 200 字元拒答強訊號）→ B（無 H2 結構）→ C（無 list bullet 內容）
+# 偵測順序：A（首 200 字元拒答強訊號）、B（無 H2 結構）、C（無 list bullet 內容）
 report() {
   local label="$1" out="$2" err="$3" rc="$4"
   # 先判存在再取大小：`wc -c < "$out" 2>/dev/null` 擋不住重導向本身的失敗訊息，

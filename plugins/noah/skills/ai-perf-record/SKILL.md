@@ -21,8 +21,8 @@ allowed-tools: Bash(gh *:*), mcp__plugin_chrome-devtools-mcp_chrome-devtools__*
 
 從 `$ARGUMENTS` 判斷模式：
 
-- 能解析出「編號 + 兩個分鐘數」三參數 → **單筆模式**，格式 `<Issue或PR編號> <導入AI前分鐘> <導入AI後分鐘>`（例：`181 180 25`）。
-- `$ARGUMENTS` 為空，或僅指示「所有 merged PR」而未帶分鐘數 → **批次模式**。
+- 能解析出「編號 + 兩個分鐘數」三參數時，採**單筆模式**，格式 `<Issue或PR編號> <導入AI前分鐘> <導入AI後分鐘>`（例：`181 180 25`）。
+- `$ARGUMENTS` 為空，或僅指示「所有 merged PR」而未帶分鐘數時，採**批次模式**。
 
 ---
 
@@ -38,7 +38,7 @@ allowed-tools: Bash(gh *:*), mcp__plugin_chrome-devtools-mcp_chrome-devtools__*
 - **使用情境與實作方式**：multiline textbox，上限 1000 字（計數器 `n / 1000`）。
 - 所有必填欄位齊全後，「儲存紀錄」按鈕才由 disabled 轉為可按。
 
-下拉操作模式皆為：`click` 展開 → `take_snapshot` 取得選項 uid → `click` 選擇目標選項。
+下拉操作模式皆為：先 `click` 展開，再 `take_snapshot` 取得選項 uid，最後 `click` 選擇目標選項。
 
 ---
 
@@ -57,13 +57,13 @@ allowed-tools: Bash(gh *:*), mcp__plugin_chrome-devtools-mcp_chrome-devtools__*
 
 備妥（編號、導入前分鐘、導入後分鐘、功能名稱、摘要）後，依序操作：
 
-1. **任務類型**：展開 → 選「程式開發」。
-2. **任務項目**：展開 → 選「程式碼生成」。
+1. **任務類型**：展開後選「程式開發」。
+2. **任務項目**：展開後選「程式碼生成」。
 3. **導入 AI 前**：`fill` 導入前分鐘。
 4. **導入 AI 後**：`fill` 導入後分鐘。
 5. **功能 / 專案名稱**：`fill` 功能名稱。
-6. **使用的 AI 工具**：`fill` `Claude Code` → **`click` 比中的 option** 確認選取。
-7. **使用情境與實作方式**：`fill` 摘要（**≤150 中文字**）。
+6. **使用的 AI 工具**：`fill` `Claude Code` 後，**`click` 比中的 option** 確認選取。
+7. **使用情境與實作方式**：`fill` 摘要（**150 中文字以內**）。
 8. `take_snapshot` 截圖，向使用者呈現完整確認表（含系統計算的效率提升 % 與節省分鐘），交付確認。**嚴禁自行點擊「儲存紀錄」。**
 
 > 任務類型/項目固定填「程式開發 / 程式碼生成」；若某筆性質不符（如純文件、bugfix），使用者可於儲存前自行於下拉微調。
@@ -82,7 +82,7 @@ allowed-tools: Bash(gh *:*), mcp__plugin_chrome-devtools-mcp_chrome-devtools__*
    gh pr list --search "#{編號}" --state all --json number,title,body
    ```
 3. 功能名稱 = `({repo-name}){標題} #{編號}`（例：`(mis-rms)外部連線 Proxy 設定 #181`）。
-4. 依需求描述與實際變更生成摘要（**≤150 中文字**），描述「AI 如何完成此項工作」。
+4. 依需求描述與實際變更生成摘要（**150 中文字以內**），描述「AI 如何完成此項工作」。
 5. 走「環境與登入檢查」+「填寫單筆紀錄的子流程」，交付使用者確認儲存。
 
 ---
@@ -104,8 +104,8 @@ allowed-tools: Bash(gh *:*), mcp__plugin_chrome-devtools-mcp_chrome-devtools__*
 4. 對每個 PR 準備填寫資料：
    - 若使用者未提供分鐘數，**依複雜度（檔案數、增減行數、功能範疇）估算**合理的導入前/後分鐘；
    - 功能名稱 = `({repo-name}){PR標題} #{PR編號}`（repo 無對應 issue 時。若該 PR 有關聯 issue，亦可改用 issue 標題/編號）；
-   - 生成摘要（**≤150 中文字**）。
-5. 逐筆執行：`navigate_page` 至 `/input` → 走「填寫單筆紀錄的子流程」→ 呈確認表（**估算的分鐘數一併標示，供使用者調整**）→ 由使用者按「儲存紀錄」。
+   - 生成摘要（**150 中文字以內**）。
+5. 逐筆執行：`navigate_page` 至 `/input`，走「填寫單筆紀錄的子流程」，呈確認表（**估算的分鐘數一併標示，供使用者調整**），再由使用者按「儲存紀錄」。
 6. **儲存後頁面會跳轉至 `/records`**，故填下一筆前**必須重新 `navigate_page` 回 `/input`**，並以新的 `take_snapshot` 取得 uid（不可沿用前一筆的舊 uid）。
 7. 全數完成後，回報總覽（已填筆數、各筆功能名稱與效率提升摘要）。
 

@@ -100,15 +100,15 @@ WORKDIR=$(printf '%s' "$INIT_OUT" | sed -n 's/^WORKDIR=//p')
 SPLIT_SUSPICIOUS=$(printf '%s' "$INIT_OUT" | sed -n 's/^SPLIT_SUSPICIOUS=//p')
 ```
 
-`init.sh` 內部：以獨立 ` -- ` token 切分 → `mktemp -d "/tmp/codex-delegate-XXXXXX"` 建立 `$ROOT`（OS 保證唯一性與 `0700` 權限）→ 於 `$ROOT/codex/` 寫 `task.md`（`STATUS: pending` + `TASK: <前半>`）、於 `$ROOT/` 寫 `host-followup.md`（`MODE:` + 後半或預設值）→ stdout 印 `ROOT=` / `WORKDIR=` / `SPLIT_SUSPICIOUS=` 三行。`$WORKDIR` 即 `$ROOT/codex`，是唯一交給 `codex.sh` 的路徑。
+`init.sh` 內部依序：以獨立 ` -- ` token 切分；以 `mktemp -d "/tmp/codex-delegate-XXXXXX"` 建立 `$ROOT`（OS 保證唯一性與 `0700` 權限）；於 `$ROOT/codex/` 寫 `task.md`（`STATUS: pending` + `TASK: <前半>`）、於 `$ROOT/` 寫 `host-followup.md`（`MODE:` + 後半或預設值）；stdout 印 `ROOT=` / `WORKDIR=` / `SPLIT_SUSPICIOUS=` 三行。`$WORKDIR` 即 `$ROOT/codex`，是唯一交給 `codex.sh` 的路徑。
 
 清理採 `EXIT` trap 加 `CLEANUP` 旗標，涵蓋所有非零退出路徑；`INT` / `TERM` / `HUP` / `QUIT` 各自顯式 `exit`，否則 bash 執行完 handler 會繼續往下跑，印出一個已被刪除的路徑給 host。路徑輸出成功後才把旗標交棒，故 stdout 寫入失敗仍會清理。
 
 **切分回報（必做）**：Read 兩個檔案後，向使用者印出兩行：
 
 ```
-→ 委派 codex：<task.md 的 TASK 內容>
-→ 我的後處理：<host-followup.md 第二行起，或「（預設）覆核並提建議，不動手」>
+委派 codex：<task.md 的 TASK 內容>
+我的後處理：<host-followup.md 第二行起，或「（預設）覆核並提建議，不動手」>
 ```
 
 **攔截規則**：`SPLIT_SUSPICIOUS` 的值決定要不要停下來，這是機械判定，不是 host 的自由心證。
@@ -197,7 +197,7 @@ host 在此階段只做兩件事：
 
 產出 `$WORKDIR/codex-answer.md`（jq 抽出的純訊息）、`$WORKDIR/codex-answer.err`（stderr 與 `[Codex Error]` / `[Codex Quota]` 診斷）、`$WORKDIR/codex-answer.raw.json`（codex 原始 JSONL 事件流；`[Schema Mismatch]` 時看這份）。codex 的輸出契約為四段 H2：`## 結論`、`## 依據`、`## 風險與不確定`、`## 建議行動`。
 
-`report()` 對 rc=0 且非空的輸出仍執行三級語意 health check，順序 A → B → C：
+`report()` 對 rc=0 且非空的輸出仍執行三級語意 health check，順序為 A、B、C：
 
 - **A**：檔案首 200 字元命中 `scripts/lib/refusal-patterns.txt` 中任一拒答 pattern
 - **B**：檔案無 H2 結構（`^## ` 一個都沒有）
@@ -269,7 +269,7 @@ host 不得建議使用者「改寫任務敘述」或「縮小素材」——那
 
 1. 立即中止流程，不重試、不降級、不改寫任務重跑
 2. 明確告訴使用者**這是 codex 端的額度／session 上限，不是任務失敗**，並附上 `[Codex Quota]` 的原始訊息
-3. 依訊息給出對應動作：`out of credits` → 儲值 workspace credits；`usage limit` / `rate limit` → 等待重置
+3. 依訊息給出對應動作：`out of credits` 需儲值 workspace credits；`usage limit` / `rate limit` 則等待重置
 4. 提醒其他依賴 codex 的 skill（例如 `code-review-tribunal`）此刻同樣不可用
 5. 照常執行 Stage 5 cleanup
 
@@ -278,23 +278,23 @@ host 不得建議使用者「改寫任務敘述」或「縮小素材」——那
 
 #### codex 失敗時的分支
 
-rc≠0 或 health check A/B/C 任一命中時，**不進覆核流程**，改為：
+rc 非 0 或 health check A/B/C 任一命中時，**不進覆核流程**，改為：
 
 1. Read `$WORKDIR/codex-answer.err`（`limit=30`，超過 200 字元的行截斷）並呈現 stderr tail
 2. 判定失敗類型並給對應建議：
-   - 未安裝 / 未登入 → 給安裝或 `codex login` 指引
-   - **`[Codex Quota] <訊息>`（rc=3）** → **先看這一條**。詳見〈額度耗盡〉一節。**重試無效**
-   - **`[Codex Error] <訊息>`** → codex 自報的其他錯誤（認證失效、伺服器錯誤等），依訊息處理。
+   - 未安裝 / 未登入：給安裝或 `codex login` 指引
+   - **`[Codex Quota] <訊息>`（rc=3）**：**先看這一條**。詳見〈額度耗盡〉一節。**重試無效**
+   - **`[Codex Error] <訊息>`**：codex 自報的其他錯誤（認證失效、伺服器錯誤等），依訊息處理。
      此類錯誤同樣只存在於 JSONL 的 `error` / `turn.failed` 事件，stderr 是空的，
      由 `extract_codex_error` 提取進 `.err`
-   - **rc=137、`Killed: 9`、耗時 0 秒** → codex 進程一啟動就被 SIGKILL。先確認 `.err` 內有無 `[Codex Quota]`；
+   - **rc=137、`Killed: 9`、耗時 0 秒**：codex 進程一啟動就被 SIGKILL。先確認 `.err` 內有無 `[Codex Quota]`；
      若無，成因是**兩次 codex 呼叫的間隔太短**，與素材大小、prompt 內容、是否經 script 包裝都無關
      （實測：8KB 與 694 bytes 素材同樣 0 秒被殺，不經 script 的直接呼叫也一樣）。
-     → **等待約 90 秒後原樣重試**，不需改動素材或 prompt；實測 90 秒足夠，重試一次即成功
-   - `[Codex Incomplete]`（跑了 tool call 但未收尾）→ 建議原樣重試
-   - `[Schema Mismatch]`（stream 內無 `item.completed`）→ codex 版本可能變動，建議檢查 `codex --version` 後回報
-   - 語意失敗 A（拒答）→ 建議改寫任務敘述
-   - 語意失敗 B / C（格式不符）→ 建議重試；連續兩次則改用其他方式
+     對策：**等待約 90 秒後原樣重試**，不需改動素材或 prompt；實測 90 秒足夠，重試一次即成功
+   - `[Codex Incomplete]`（跑了 tool call 但未收尾）：建議原樣重試
+   - `[Schema Mismatch]`（stream 內無 `item.completed`）：codex 版本可能變動，建議檢查 `codex --version` 後回報
+   - 語意失敗 A（拒答）：建議改寫任務敘述
+   - 語意失敗 B / C（格式不符）：建議重試；連續兩次則改用其他方式
 3. 照常執行 Stage 5 cleanup
 
 ---
@@ -325,7 +325,7 @@ echo "Removed: $ROOT"
 
 ## AGENTS.md 指令鏈
 
-codex 啟動時會依「全域 `~/.codex/AGENTS.md` → git root → cwd」的順序載入 `AGENTS.md`，
+codex 啟動時會依「全域 `~/.codex/AGENTS.md`、git root、cwd」的順序載入 `AGENTS.md`，
 **作為指令層而非普通素材**。實測確認：在含 `AGENTS.md` 的 repo 內問一個與該檔無關的問題，
 codex 會遵照其中的格式要求作答。
 
@@ -352,7 +352,7 @@ codex 會遵照其中的格式要求作答。
 ## 注意事項
 
 - **執行成本**：2 次 codex 呼叫（Stage 0 preflight + Stage 3 ask）加 host 備料與抽驗。Stage 3 的耗時隨任務複雜度變動，涵蓋整個 skill 的完整 review 實測需 6-7 分鐘（codex 反覆讀檔，事件流可達 140KB）。呼叫端 timeout 須據此設定，勿沿用 2 分鐘的預設值。preflight 會套用與正式呼叫相同的 `CODEX_DELEGATE_MODEL`，避免 model 無效時 preflight 通過、正式委派才失敗。兩次呼叫都會消耗 codex 額度
-- **失敗即中止**：Stage 3 失敗（rc≠0 / 檔案為空 / health check 不過）不進覆核，直接走失敗分支與 cleanup
+- **失敗即中止**：Stage 3 失敗（rc 非 0 / 檔案為空 / health check 不過）不進覆核，直接走失敗分支與 cleanup
 - **Single Bash call 規則**：Stage 1 init 與 Stage 5 cleanup 各須在單一 Bash tool call 內以同步模式完成（保證 shell variable 持久）。禁用 Bash tool 的 `run_in_background=true`
 - **單次使用且不留痕**：流程結束即清空工作目錄；兩次 codex 呼叫都帶 `--ephemeral`，session 不寫入磁碟
   （實測 `~/.codex/sessions` 檔案數呼叫前後不變）。本 skill 是 one-shot 委派，不需要 session record——

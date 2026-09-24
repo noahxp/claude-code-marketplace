@@ -171,14 +171,14 @@ echo "CODEX_RC=$CODEX_RC AGY_RC=$AGY_RC"
 
 ### Stage 5：最終統整 — Claude Code 收斂為 final.md
 
-Host 用 `Read` 讀全部九份 .md 結果檔（三輪 × 三方，不含 `.err`），依專業判斷整合為 `$WORKDIR/final.md`，含以下章節：
+Host 用 `Read` 讀全部九份 .md 結果檔（三方各三輪，不含 `.err`），依專業判斷整合為 `$WORKDIR/final.md`，含以下章節：
 
 1. **執行診斷**：列出三方各輪次 success/failure；含失敗者 stderr tail（從 `.err` 檔，`Read limit=30` 並對超過 200 字元的行截斷）
 2. **共識度圖例與升級門檻**：
-   - **Unanimous** — 三方一致 → 列入 Critical
-   - **Majority (A + B)** — 兩方明確同意 + 第三方未明確反對 → 列入 Critical 標 Majority；第三方完全未表態時加 `[第三方未表態]` 註記
-   - **Disputed** — 三方分歧 / 第三方明確反對 → 移至「主要分歧點」，不列入 Critical
-   - **[NEW-CRITICAL]** — 單方在第三輪首次提出 → 不列入 Critical，移至「未獲共識的潛在風險」段並附 host 評析
+   - **Unanimous** — 三方一致，列入 Critical
+   - **Majority (A + B)** — 兩方明確同意 + 第三方未明確反對，列入 Critical 並標 Majority；第三方完全未表態時加 `[第三方未表態]` 註記
+   - **Disputed** — 三方分歧 / 第三方明確反對，移至「主要分歧點」，不列入 Critical
+   - **[NEW-CRITICAL]** — 單方在第三輪首次提出，不列入 Critical，移至「未獲共識的潛在風險」段並附 host 評析
 
    「明確反對」由 host 依下列訊號自由判斷：(a) 提出替代方案；(b) 降級嚴重度（將 Critical 改評為 Important）；(c) 顯式否定字眼；(d) 撤回前輪同意。host 是唯一能讀到三方 round3 的角色，須完整覆核三輪後仲裁，不可被動接受 cli 自評。
 
@@ -197,11 +197,11 @@ Host 用 `Read` 讀全部九份 .md 結果檔（三輪 × 三方，不含 `.err`
 
 **Host 仲裁要點**：
 - cli 自評的 `[Majority: 我 + X]` 須由 host 重新覆核 X 在三輪中是否明確反對；若反對則降為 Disputed
-- 失敗檔（rc≠0 或語意 health check 不通過）不可作為 Majority 證據；該方為支持方時須降為 Disputed
+- 失敗檔（rc 非 0 或語意 health check 不通過）不可作為 Majority 證據；該方為支持方時須降為 Disputed
 - cli 第三輪輸出的 `[Majority: 我 + X]` 須由 host 正規化為 `[Majority (cli-self-name + X)]`，cli 名稱嚴格使用 `Claude Code` / `codex cli` / `agy cli`
 - 違反 prompt 規範的條目（缺 tag / 缺 file:line 等）host 仍須保留內容並按其原始嚴重度納入，不丟棄
 
-**語意 health check**：cli script `report()` 函式對 rc=0 且檔案非空的輸出仍會執行三級語意檢查，順序為 A → B → C：
+**語意 health check**：cli script `report()` 函式對 rc=0 且檔案非空的輸出仍會執行三級語意檢查，順序為 A、B、C：
 - **A**：檔案首 200 字元命中 `scripts/lib/refusal-patterns.txt` 中任一拒答 pattern（host 須對自由文字 review 結果同樣比照）
 - **B**：檔案無 H2 結構
 - **C**：檔案無 list bullet 內容（H2 框架空殼）
@@ -221,9 +221,9 @@ Host 用 `Read` 讀全部九份 .md 結果檔（三輪 × 三方，不含 `.err`
 
 | 階段 | Claude Code | codex cli | agy cli |
 |------|-------------|-----------|------------|
-| 第一輪 | ✅ X bytes | ✅ Y bytes | ✅ Z bytes |
-| 第二輪 | ✅ | ✅ | ⚠️ 失敗 |
-| 第三輪 | ✅ | ✅ | ⚠️ 失敗 |
+| 第一輪 | 成功（X bytes） | 成功（Y bytes） | 成功（Z bytes） |
+| 第二輪 | 成功 | 成功 | **失敗** |
+| 第三輪 | 成功 | 成功 | **失敗** |
 
 ### 失敗詳情（若有）
 - agy 第二輪失敗 stderr tail（Read limit=30，超過 200 字元的行截斷）：...
@@ -297,7 +297,7 @@ echo "Removed: $WORKDIR"
 
 - **執行成本**：6 次 cli 呼叫 + Claude Code 多 sub-agent dispatch；總時長預估 3-8 分鐘
 - **Claude Code 雙重身份**：同時是參與者與統整者，統整時須自我約束，不偏袒自己各輪觀點
-- **失敗即中止**：cli 任一輪失敗（rc≠0 / 檔案為空 / 語意 health check 不通過）即中止整流程；host 告知使用者並建議重試
+- **失敗即中止**：cli 任一輪失敗（rc 非 0 / 檔案為空 / 語意 health check 不通過）即中止整流程；host 告知使用者並建議重試
 - **Single Bash call 規則**：Stage 1 init / Stage 2-4 的 cli 平行段 / Stage 6 cleanup，每段須在單一 Bash tool call 內以同步模式完成（保證 shell variable 與 background PID 持久）。禁用 Bash tool 的 `run_in_background=true`，也不要將 cli script 派給 Task sub-agent 執行
 - **macOS 注意事項**：BSD `grep` 不支援 `-P`（Perl 正則）；host 在 Stage 5 若需 lookahead 等進階 regex，請改走 Python `re`，或 `brew install grep` 後使用 `ggrep -P`
 - **單次使用**：流程結束清空工作目錄，下次重新建立

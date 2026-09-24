@@ -74,7 +74,7 @@ WORKDIR="$ROOT/codex"
 mkdir -p "$WORKDIR"
 
 # task.md：codex 的唯一輸入。
-# STATUS: pending → host 界定範圍（必要時 append 少量素材）後以 `codex.sh ready` 翻轉；ask 會檢查，未就緒即 die
+# 初始為 STATUS: pending，host 界定範圍（必要時 append 少量素材）後以 `codex.sh ready` 翻轉；ask 會檢查，未就緒即 die
 # 一律用 printf 而非 echo：followup 內容可能為 `-n` / `-e`，會被 echo 當旗標吞掉
 {
   printf 'STATUS: pending\n'

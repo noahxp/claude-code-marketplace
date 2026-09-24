@@ -30,8 +30,8 @@ run_codex_call() {
     jq -r 'select(.type=="item.completed" and .item.type=="agent_message") | .item.text' "$raw" > "$out" 2>>"$err"
     local jq_rc=$?
     # raw 非空但 jq 抽不到 agent_message：再分兩種情境，避免一律誤判為 schema drift
-    #   - raw 內存在其他 item.completed（如 command_execution）→ codex 跑了 tool call 但「未收尾」，應重試
-    #   - raw 內完全沒有 item.completed → 真 schema 變動或 codex 早夭
+    #   - raw 內存在其他 item.completed（如 command_execution）：codex 跑了 tool call 但「未收尾」，應重試
+    #   - raw 內完全沒有 item.completed：真 schema 變動或 codex 早夭
     if [ "$jq_rc" -eq 0 ] && [ -s "$raw" ] && [ ! -s "$out" ]; then
       local has_completed
       has_completed=$(jq -r 'select(.type=="item.completed") | .type' "$raw" 2>/dev/null | head -1)

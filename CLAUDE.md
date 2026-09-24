@@ -11,20 +11,20 @@
 
 ```
 claude-code-marketplace/
-├── .claude-plugin/
-│   └── marketplace.json          # Marketplace 註冊表（plugin 清單）
-├── plugins/
-│   └── <plugin-name>/            # 每個 plugin 一個目錄（kebab-case）
-│       ├── .claude-plugin/
-│       │   └── plugin.json       # Plugin metadata
-│       └── skills/
-│           └── <skill-name>/     # 每個 skill 一個目錄（kebab-case）
-│               └── SKILL.md      # Skill 定義（YAML frontmatter + Markdown body）
-├── tests/                        # skill script 的回歸測試（不隨 plugin 分發）
-│   ├── run-all.sh
-│   └── <skill-name>/
-├── CLAUDE.md
-└── README.md
+|-- .claude-plugin/
+|   `-- marketplace.json          # Marketplace 註冊表（plugin 清單）
+|-- plugins/
+|   `-- <plugin-name>/            # 每個 plugin 一個目錄（kebab-case）
+|       |-- .claude-plugin/
+|       |   `-- plugin.json       # Plugin metadata
+|       `-- skills/
+|           `-- <skill-name>/     # 每個 skill 一個目錄（kebab-case）
+|               `-- SKILL.md      # Skill 定義（YAML frontmatter + Markdown body）
+|-- tests/                        # skill script 的回歸測試（不隨 plugin 分發）
+|   |-- run-all.sh
+|   `-- <skill-name>/
+|-- CLAUDE.md
+`-- README.md
 ```
 
 **`tests/` 為何在根層而非 `plugins/` 底下**：`marketplace.json` 的 `source` 指向整個

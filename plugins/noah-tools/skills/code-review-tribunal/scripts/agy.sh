@@ -50,7 +50,7 @@ sentinel_suffix() {
 EOF
 }
 
-# 共用：執行 agy print 模式 → 擷取 sentinel 內純內容寫入 $out
+# 共用：執行 agy print 模式，再擷取 sentinel 內純內容寫入 $out
 # 逾時/缺閉合 sentinel/空內容皆升 rc=2，落實 fail-fast
 run_agy_call() {
   local prompt="$1" out="$2" err="$3" include_dir="$4"
