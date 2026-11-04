@@ -19,14 +19,14 @@
     },
     {
       "name": "noah-tools",
-      "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-preview）、三方仲裁式 code review（code-review-tribunal）、PR merge message 擬稿（pr-merge-message-draft）、codex 任務委派（codex-delegate）等。",
+      "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-preview）、三方仲裁式 code review（code-review-tribunal）、PR merge message 擬稿（pr-merge-message-draft）、codex 任務委派（codex-delegate）、分支審查迴圈（review-loop）等。",
       "author": {
         "name": "Noah"
       },
       "source": "./plugins/noah-tools",
       "category": "Productivity",
-      "version": "1.7.1",
-      "tags": ["noah", "visual-preview", "preview", "html", "browser", "live-preview", "code-review-tribunal", "code-review", "multi-model", "codex", "agy", "antigravity", "pr-merge-message-draft", "merge-message", "commit-message", "conventional-commits", "codex-delegate", "delegation"]
+      "version": "1.8.0",
+      "tags": ["noah", "visual-preview", "preview", "html", "browser", "live-preview", "code-review-tribunal", "code-review", "multi-model", "codex", "agy", "antigravity", "pr-merge-message-draft", "merge-message", "commit-message", "conventional-commits", "codex-delegate", "delegation", "review-loop"]
     }
   ]
 }

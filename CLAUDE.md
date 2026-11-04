@@ -17,6 +17,7 @@ claude-code-marketplace/
 |   `-- <plugin-name>/            # 每個 plugin 一個目錄（kebab-case）
 |       |-- .claude-plugin/
 |       |   `-- plugin.json       # Plugin metadata
+|       |-- agents/               # 供 skill 派工的 subagent 定義（選用；呼叫名為 <plugin>:<agent>）
 |       `-- skills/
 |           `-- <skill-name>/     # 每個 skill 一個目錄（kebab-case）
 |               `-- SKILL.md      # Skill 定義（YAML frontmatter + Markdown body）
