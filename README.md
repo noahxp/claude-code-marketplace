@@ -6,7 +6,7 @@ Noah 的個人 Claude Code Plugin Marketplace。
 
 | Plugin | 說明 | 版本 |
 |--------|------|------|
-| [noah:ai-perf-record](./plugins/noah/skills/ai-perf-record) | 透過 Chrome DevTools 自動填寫 AI 效率提升紀錄表單 | 2.7.1 |
+| [noah:ai-perf-record](./plugins/noah/skills/ai-perf-record) | 透過 Claude in Chrome 自動填寫 AI 效率提升紀錄表單 | 2.7.2 |
 | [noah-tools:visual-preview](./plugins/noah-tools/skills/visual-preview) | 瀏覽器即時預覽：啟動本地 HTTP server 監看目錄並自動渲染最新 HTML，支援點擊選取互動 | 1.3.0 |
 | [noah-tools:code-review-tribunal](./plugins/noah-tools/skills/code-review-tribunal) | 三方仲裁式 code review：Claude Code、codex cli、agy cli 各自評審後互讀辯論三回合，Claude Code 依共識度仲裁產出最終定稿；含語意失敗 health check、NEW-CRITICAL 隔離、cli fail-fast；target 支援 PR / 路徑 / commit ref / git range / multi-ref / 自由文字 | 1.7.1 |
 | [noah-tools:pr-merge-message-draft](./plugins/noah-tools/skills/pr-merge-message-draft) | 為 PR 擬定 merge 用的 Commit Message（標題）與 Extended Description（內文）：以最終 diff 為事實依據，PR 描述／commit／review 討論與程式註解僅作待驗證主張，修正是否成立對照 base sha 判定、PR 已合併時先告知，未驗證的 why 於草稿逐句標註；格式先依專案文件規範（CONTRIBUTING／commitlint／CLAUDE.md），不從既有 git log 歸納，未規範處依 OSS／業界最佳實踐（Conventional Commits、標題 50/72、footer 與 git trailer 分段），內文不硬換行；預設英文 type/scope + 繁中，只摘「為何改 + 主要影響」、不照抄 PR description；只寫通過刪除檢驗的必要內容並濃縮（每件事只寫一次、只寫變化、影響寫成可觀察的結果，影響範圍以程式確認），導言預設一句；`!` 只標下游須跟著改的變更（含請求條件收緊），`BREAKING CHANGE` 逐項列出介面、變化與遷移方式，本服務的佈建與上線步驟不寫進 message；標題預設保留 `(#N)`，僅 squash merge 時由 commit 作者推導 `Co-authored-by`；target 支援當前 repo 的 PR 編號 / URL / 當前分支 / commit ref；僅輸出文字供確認後定稿 | 1.9.0 |
