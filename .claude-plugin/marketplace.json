@@ -25,7 +25,7 @@
       },
       "source": "./plugins/noah-tools",
       "category": "Productivity",
-      "version": "1.9.0",
+      "version": "1.9.1",
       "tags": ["noah", "visual-preview", "preview", "html", "browser", "live-preview", "code-review-tribunal", "code-review", "multi-model", "codex", "agy", "antigravity", "pr-merge-message-draft", "merge-message", "commit-message", "conventional-commits", "codex-delegate", "delegation", "review-loop"]
     }
   ]

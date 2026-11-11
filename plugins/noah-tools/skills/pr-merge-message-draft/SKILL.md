@@ -36,7 +36,7 @@ PR description 是給 reviewer 看的脈絡，會隨 PR 關閉而沉沒；merge 
 | commit ref / range | 單一 commit：`git show <ref>`；range：`git log --format='%h %an <%ae>%n%s%n%b' <range>` 取主旨與作者、`git diff <range>` 取淨變更 |
 
 **先確認 PR 狀態與 base**（target 為 PR 時，取材前先做）：
-- `state` 不是 `OPEN`（已合併或已關閉）時，merge 訊息已無處可用：先告知使用者並停下，使用者仍要繼續（例如用來評估）才往下做
+- `state` 不是 `OPEN`（已合併或已關閉）時，merge 訊息已無處可用：先告知使用者並停下，使用者仍要繼續（例如用來評估）才往下做。已合併時不讀它的 merge commit 訊息（`git log`、`git show` 該 commit 與 commits API 的 `message` 都不看）：那正是本產出要取代的訊息，讀了草稿會被它錨定
 - base 端一律以 sha 讀取，不用 branch 名稱：branch 會移動，PR 合併後 base 分支已含 PR 本身，比對會變成拿 head 比 head 而不自知。`OPEN` 時 base sha 為 `gh api repos/{owner}/{repo}/compare/<baseRefOid>...<headRefOid> --jq .merge_base_commit.sha`；已合併時為 merge commit 的第一個 parent（`gh api repos/{owner}/{repo}/commits/<mergeCommit.oid> --jq '.parents[0].sha'`）。base 端的程式碼以本地 git 讀取：`git show "<base sha>:<path>"` 讀檔、`git grep <pattern> <base sha>` 做全 repo 搜尋（zsh 下 sha 放在變數裡時寫成 `"${B}:<path>"`：不加大括號的 `$B:s…` 會被當成修飾符而報 `bad substitution`）；本地沒有該 sha 時先 `git fetch origin <baseRefName>`
 - 呈草稿前再查一次 `state`：執行途中被合併時，照上一點告知使用者
 
@@ -101,7 +101,7 @@ PR description 是給 reviewer 看的脈絡，會隨 PR 關閉而沉沒；merge 
 - 主張與 diff 矛盾：以 diff 為準（例：description 寫「新增快取層」，但快取已在 review 中移除，就不寫）
 - diff 有、主張沒寫：breaking 變更、migration、公開介面移除、刪除的功能須補進 message；其餘變更依對使用者或系統的影響取捨，不必逐一補齊
 - diff 的程式行為無從佐證的敘述（僅有主張或註解支持，或由你自行推論，含依賴函式庫語意或外部架構的推論）：why 與「原本會怎樣」可採用，但呈草稿時逐句標為「未驗證」交使用者確認；推論出的影響或風險只列在草稿說明，使用者確認後才寫進 message
-  - 函式庫語意的界線：API 依名稱直接產生的效果（如 `excludeHttpMethods(OPTIONS)` 讓 OPTIONS 不進 interceptor）算事實；框架的隱性自動行為（如在某平台上自動啟用某設定）才標未驗證。資料庫或語言規格中有文件記載的語意（如 `FOR SHARE` 與 `FOR UPDATE` 互斥）同樣算事實；要推演時序或併發情境才得出的結果，標未驗證
+  - 函式庫語意的界線：API 依名稱直接產生的效果（如 `excludeHttpMethods(OPTIONS)` 讓 OPTIONS 不進 interceptor）算事實；框架的隱性自動行為（如在某平台上自動啟用某設定）才標未驗證。資料庫、語言規格或函式庫官方文件記載的語意（如 `FOR SHARE` 與 `FOR UPDATE` 互斥、某個 IP matcher 支援 IPv6）同樣算事實；要推演時序或併發情境才得出的結果，標未驗證
   - 「推論出的影響或風險」專指 PR 與程式都沒提到、由你自行推得的新情境（如「若某元件可被直連即可繞過」）；PR 或程式已涉及的行為變化，依「原本會怎樣」與「影響」處理，不因換個說法而改變分類
 - 影響範圍以程式為準：PR 對副作用與影響範圍的描述可能低估或誇大；寫進 message 前，從程式確認它在什麼條件下發生（每次必發，或只在特定情境）
 - 以 base 為比較基準：「修正了什麼」「原本會怎樣」一律拿 base sha 的行為對照最終 diff 判定（base sha 取法見〈先確認 PR 狀態與 base〉）。PR 中途 commit 才出現、又在後續 commit 修掉的問題，對 base 不成立，不算這次合併的修正；commit 主旨與 PR description 常把這類中途修補寫成改進
@@ -135,8 +135,8 @@ PR description 是給 reviewer 看的脈絡，會隨 PR 關閉而沉沒；merge 
 - **type/scope 用英文，描述部分用繁體中文**、動作導向、精煉
 - **PR 編號**：以 target 判定——target 為 PR（含 diff 改從本地 git 取得時）在標題結尾附 ` (#N)`（如 `fix(profile): 修正無頭像使用者個人頁面崩潰 (#57)`）；target 為 commit ref／range，或無參數且查無 PR 時不加
 - 結尾**不加句號**、不用 emoji
-- **type 以 diff 判定**，不沿用 PR 標題自標的 type：新增能力為 `feat`、修正缺陷為 `fix`。兩者並存時，以合併後最主要的行為變化決定，另一類寫進條列；刻意收緊既有政策（如存取限制）不是修缺陷，歸 `feat`
-- **`!` 的判準是「下游須跟著改」**：diff 移除或不相容變更他人依賴的介面時，type/scope 後**必須**加 `!`（如 `refactor(auth)!:`）並附 `BREAKING CHANGE:`。他人依賴的介面指公開 API（含給其他團隊、BU、產品呼叫的 API）、CLI、函式庫匯出、其他系統讀寫的 schema，以及函式庫／CLI 使用者自備的設定檔。請求端條件收緊（選填改必填、新增必帶的 header 或參數、縮小可接受的值）算不相容。回應（含錯誤回應）的狀態碼或形狀改變時，看原本有沒有文件記載：有記載的改了才算不相容；回應的值（如錯誤文案）改變，只有在文件把該值列為契約時才算不相容；原本未定義的錯誤（如未處理例外造成的 500）改為有定義的回應，不加 `!`。介面不相容已由程式確認、但「有沒有外部使用者」只有 README 或註解（含 base 端被 diff 刪除的註解）可依時，照加 `!`，並在草稿說明標出依據。只需本服務自身部署環境佈建的事項（新增必填環境變數、build secret、GitOps／infra 設定、本服務 DB 的 migration）**不加 `!`**，也不寫進 message，上線步驟留在 spec、runbook。semantic-release／release-please 類專案以 type 決定版號（`feat` 升 minor、`fix` 升 patch、`!` 升 major），選錯即發錯版
+- **type 以 diff 判定**，不沿用 PR 標題自標的 type：新增能力為 `feat`、修正缺陷為 `fix`。兩者並存時，以合併後最主要的行為變化決定，另一類寫進條列；刻意收緊既有政策（如存取限制）不是修缺陷，歸 `feat`。依賴或基礎映像的升版，沒有新增能力也沒有修正本 repo 的缺陷時為 `build`（Angular 慣例：影響建置系統或外部依賴的變更）；升版附帶的修補（如 CVE）依「兩者並存」寫進條列
+- **`!` 的判準是「下游須跟著改」**：diff 移除或不相容變更他人依賴的介面時，type/scope 後**必須**加 `!`（如 `refactor(auth)!:`）並附 `BREAKING CHANGE:`。他人依賴的介面指公開 API（含給其他團隊、BU、產品呼叫的 API）、CLI、函式庫匯出、其他系統讀寫的 schema，以及函式庫／CLI 使用者自備的設定檔。請求端條件收緊（選填改必填、新增必帶的 header 或參數、縮小可接受的值）算不相容。回應（含錯誤回應）的狀態碼或形狀改變時，看原本有沒有文件記載：有記載的改了才算不相容；回應的值（如錯誤文案）改變，只有在文件把該值列為契約時才算不相容；原本未定義的錯誤（如未處理例外造成的 500）改為有定義的回應，不加 `!`。介面不相容已由程式確認、但「有沒有外部使用者」只有 README 或註解（含 base 端被 diff 刪除的註解）可依時，照加 `!`，並在草稿說明標出依據。只需本服務自身部署環境佈建的事項（新增必填環境變數、build secret、GitOps／infra 設定、本服務 DB 的 migration）**不加 `!`**；這些佈建事項與上線步驟都不寫進 message，留在 spec、runbook。唯獨 migration 改變的 schema 或資料屬於這次合併做了什麼，依〈交叉比對〉寫進條列，只是不寫執行它的步驟。semantic-release／release-please 類專案以 type 決定版號（`feat` 升 minor、`fix` 升 patch、`!` 升 major），選錯即發錯版
 
 ### Extended Description（內文）
 
@@ -189,6 +189,7 @@ PR description 是給 reviewer 看的脈絡，會隨 PR 關閉而沉沒；merge 
 ### 去噪（移除這些）
 
 - 逐行／逐檔實作細節、變更檔案 churn（diff 可知者）、逐 commit 列舉、**測試／驗證證據**（手動驗證細節、CI 綠燈、`trivy`／安全掃描通過、`docker build` 成功等——「驗證通過」非 history 重點，要留的是「改了什麼、影響為何」）、PR 的 FAQ／已知限制、給 reviewer 的協調或範圍提示（如「與某團隊協調」「touches every package」「shim timeline」）、依 repo 慣例輪替刪除的檔案（例行清理，不算〈交叉比對〉所說的「刪除的功能」）。
+- **測試程式（有主程式時）**：message 以主程式為主，敘述不以「測試檔」「測試側」等字眼反覆點出測試。主程式指這次合併交付的程式，也就是產品程式碼；PR 的主要交付是共用的 fake、fixture、test helper 等測試基礎設施時，主程式就是該模組，驗證它的測試仍算測試。測試案例、斷言、契約測試、測試資料的新增或修改預設不寫：測試守住的若正是這次主程式的新行為，主程式的描述已經交代。只有測試帶出主程式描述之外的資訊時才提，例如守住本次沒改、日後容易被改壞的既有行為，或刻意改變驗證方式（如改走真實路徑、改連真 DB）；寫在主程式的條列之後，至多一條，並在草稿說明標「測試，可刪」交使用者決定。實質變更全是測試案例（如補覆蓋、修 flaky test）時，測試就是主角：寫它守住了什麼行為；標題的 `test` 已點出範圍，條列直接寫被守住的行為，不再冠「測試檔」。不論哪種情況，寫進 message 的測試若改寫自既有測試，都補一句舊版漏掉什麼，例如會放過哪種回歸。其餘規則照常適用：不逐支列測試，測試數與驗證證據不寫。
 - repo 內持久紀錄（spec、ADR、runbook，以及程式註解、javadoc）已記載的背景、佐證與上線步驟：message 只留一句結論，不重述。註解在驗證時仍屬主張（見〈取材原則〉），兩者不衝突。
 - **例外（要點名）**：刻意同步的「**一組檔案**」若本身就是變更結構（如 spec／config repo 的版號三處同步），**該點名**——這不是 diff 噪音，是有用的決策紀錄。同理，**刻意設計的工具權限邊界**（allowed-tools，如唯讀／sandbox）與**關鍵分類映射規則**（如 Conventional Commits type 對應 changelog 區段，feat 歸入 Added）若屬決策，亦該點名，非實作噪音。
 
@@ -275,6 +276,7 @@ Signed-off-by: <姓名> <<email>>
 | 含糊「版號同步」不點名刻意同步的檔案組 | 去噪例外：刻意的一組檔案即變更結構，該點名 |
 | 列 diff 可知檔案 churn／逐 commit／FAQ／reviewer note | 去噪：移除（但 bugfix 修法、工具能力該留） |
 | 留驗證證據（trivy 0 CRITICAL／docker build 成功／CI 綠燈） | 去噪：驗證通過非 history 重點，移除 |
+| 有主程式卻描述測試的增修（含以測試重述主程式已寫的行為），或以「測試檔」「測試側」反覆修飾敘述 | 去噪：以主程式為主，測試只在帶出主程式描述之外的資訊時提及並標「可刪」 |
 | 機制當主角、把實作細節當主句 | 內容：機制作附帶，問題／影響為主 |
 | 不分規模流水帳全列 | 內容：收斂，數量依規模 |
 | 條列夾帶原狀列舉、決策推導、佐證出處或次要後果，篇幅膨脹 | 內容：逐句做刪除檢驗，只留改了什麼、為何改、影響為何 |

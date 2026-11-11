@@ -1,7 +1,7 @@
 {
   "name": "noah-tools",
   "description": "Noah 的通用工具集：瀏覽器即時預覽（visual-preview）、三方仲裁式 code review（code-review-tribunal）、PR merge message 擬稿（pr-merge-message-draft）、codex 任務委派（codex-delegate）、分支審查迴圈（review-loop）等。",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "author": {
     "name": "Noah"
   }
