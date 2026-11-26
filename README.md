@@ -12,6 +12,7 @@ Noah 的個人 Claude Code Plugin Marketplace。
 | [noah-tools:pr-merge-message-draft](./plugins/noah-tools/skills/pr-merge-message-draft) | 為 PR 擬定 merge 用的 Commit Message（標題）與 Extended Description（內文）：以最終 diff 為事實依據，PR 描述／commit／review 討論與程式註解僅作待驗證主張，修正是否成立對照 base sha 判定、PR 已合併時先告知，未驗證的 why 於草稿逐句標註；格式先依專案文件規範（CONTRIBUTING／commitlint／CLAUDE.md），不從既有 git log 歸納，未規範處依 OSS／業界最佳實踐（Conventional Commits、標題 50/72、footer 與 git trailer 分段），內文不硬換行；預設英文 type/scope + 繁中，只摘「為何改 + 主要影響」、不照抄 PR description，有主程式時以主程式為主、測試僅在重要時提及；只寫通過刪除檢驗的必要內容並濃縮（每件事只寫一次、只寫變化、影響寫成可觀察的結果，影響範圍以程式確認），導言預設一句；`!` 只標下游須跟著改的變更（含請求條件收緊），`BREAKING CHANGE` 逐項列出介面、變化與遷移方式，本服務的佈建與上線步驟不寫進 message；標題預設保留 `(#N)`，僅 squash merge 時由 commit 作者推導 `Co-authored-by`；target 支援當前 repo 的 PR 編號 / URL / 當前分支 / commit ref；僅輸出文字供確認後定稿 | 1.9.1 |
 | [noah-tools:codex-delegate](./plugins/noah-tools/skills/codex-delegate) | 把一件事委派給 codex cli 在唯讀沙箱執行，Claude Code 覆核其產出後接手：一句指令以獨立 ` -- ` token 機械切分為「給 codex 的任務」與「給 Claude Code 的後處理指示」，後者絕不進入 codex prompt；含可疑切分偵測、四段輸出契約與語意 health check；覆核要求逐點標註採信／存疑／引用不符／未驗證並抽驗 [file:line] | 1.7.1 |
 | [noah-tools:review-loop](./plugins/noah-tools/skills/review-loop) | 分支審查迴圈：以 `/code-review` xhigh 起手、medium 追到清零，再由獨立 subagent 判定是否從 xhigh 再審一輪（外圈至多 3 輪、每輪 medium 至多 3 次）；每項事實主張由唯讀 subagent 盲審複查，成立與誤報皆須附 `file:line` 證據，兩方不一致以測試裁定，修正前須紅燈；判定記入各 worktree 的審查記錄，跨審查與 `/clear` 略過已判定項目；需要討論的項目於修正前停下詢問，依答覆修正、記入 ADR 或另開 issue 後才續跑；收尾跑一次兩軸審查並同步設計紀錄 | 1.8.1 |
+| [noah-tools:dev-council](./plugins/noah-tools/skills/dev-council) | 向使用者提問前的三方會診：main agent 原本要問使用者的問題（授權、只有使用者知道的資訊、需使用者親手操作的事除外），先由 Claude subagent、codex cli、agy cli 依同一份 brief 各自獨立回答，再讀過彼此報告互評（各方一致即跳過第二輪）；需求類問題先從 repo 的 spec 與文件找依據；main agent 主持不下場，抽驗各方引用後依序分流為請使用者仲裁、執行實驗定案或直接照答案執行，只把需要仲裁的帶給使用者；某方額度用完、未安裝或連續失敗即缺席，由其餘各方繼續，登入失效則暫停並請使用者在另一個視窗登入；agy 以 plan mode 執行，避免 headless 預設的 Auto mode 改寫 repo | 1.10.0 |
 
 ## 安裝方式
 
@@ -40,7 +41,8 @@ claude-code-marketplace/
         |-- agents/             # 供 skill 派工的 subagent 定義（選用）
         `-- skills/
             `-- <skill-name>/
-                `-- SKILL.md    # Skill 定義
+                |-- SKILL.md    # Skill 定義
+                `-- README.md   # 安裝後設定等說明（選用）
 ```
 
 ## 新增 Plugin

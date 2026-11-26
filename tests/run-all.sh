@@ -20,6 +20,13 @@ run_suite() {
 run_suite "codex-delegate / init.sh"  tests/codex-delegate/test-init.sh  "$CD_SCRIPTS/init.sh"
 run_suite "codex-delegate / codex.sh" tests/codex-delegate/test-codex.sh "$CD_SCRIPTS/codex.sh"
 
+DC_SCRIPTS=plugins/noah-tools/skills/dev-council/scripts
+run_suite "dev-council / init.sh"       tests/dev-council/test-init.sh   "$DC_SCRIPTS/init.sh"
+run_suite "dev-council / lib/common.sh" tests/dev-council/test-common.sh "$DC_SCRIPTS"
+run_suite "dev-council / codex.sh"      tests/dev-council/test-codex.sh  "$DC_SCRIPTS/codex.sh"
+run_suite "dev-council / agy.sh"        tests/dev-council/test-agy.sh    "$DC_SCRIPTS/agy.sh"
+run_suite "dev-council / claude.sh"     tests/dev-council/test-claude.sh "$DC_SCRIPTS/claude.sh"
+
 if [ "$TOTAL_FAIL" -eq 0 ]; then
   echo "所有測試套件通過"
 else

@@ -28,5 +28,12 @@ bash tests/codex-delegate/test-codex.sh plugins/noah-tools/skills/codex-delegate
 |------|------|------|
 | `codex-delegate/test-init.sh` | `init.sh` 的切分契約、可疑切分偵測、破壞性動作偵測、NO_SPLIT、殘留檢查 | 30 |
 | `codex-delegate/test-codex.sh` | `codex.sh` 的 model 參數、`--ephemeral`、rc 傳遞、health check A/B/C、額度分類、後處理指示不得進入 prompt、STATUS 契約、`safe_rm` 路徑防護 | 39 |
+| `dev-council/test-init.sh` | `init.sh` 的工作目錄位置、權限與唯一性 | 6 |
+| `dev-council/test-common.sh` | `lib/common.sh` 的登入／額度／其他失敗分類（含兩方登出時的實測訊息，以及兩個 cli 執行檔內的 token 過期訊息）、brief 五段檢查（含舊版除錯段落不被接受）、health check、成功檔與 `.failed.md` 命名、其他方成功檔清單 | 48 |
+| `dev-council/test-codex.sh` | `codex.sh` 的 preflight 各回傳碼、唯讀沙箱與 `--ephemeral`、rc=137 冷卻重試、登出時的實測錯誤事件、回覆內容不誤判為登入失效、第二輪只列成功的其他方、中途終止仍清掉暫存目錄、prompt 的唯讀指令提示 | 41 |
+| `dev-council/test-agy.sh` | `agy.sh` 的 preflight 各回傳碼、`--mode plan`、`--settings` 唯讀指令允許清單（須完全相符，不含有寫檔或執行參數的指令）且與 prompt 列出的一致、在 repo 內執行與 `--add-dir`、sentinel 擷取、截斷回覆不誤判為登入失效、第二輪只列成功的其他方、中途終止仍清掉暫存目錄、預設時間上限 600s 與新版逾時訊息的提示、登出時的實測訊息（stdout 為空時不印誤導的標籤） | 48 |
+| `dev-council/test-claude.sh` | `claude.sh` 的派工 prompt（以「答案」回應 brief 的問題、需求類先查 spec）與 health check、失敗改名 | 20 |
 
-`codex-delegate/helpers.sh` 是兩份測試共用的 `safe_rm` 與 `field_of`。
+各 skill 目錄下的 `helpers.sh` 是該 skill 測試共用的函式（`safe_rm`、`field_of` 等）。
+
+`dev-council/smoke-agy-allowlist.sh` 是手動冒煙測試：呼叫真實 agy，確認指令允許清單擋得下 `;`、`&&` 串接、輸出重導向與指令替換。它會消耗 agy 額度且需已登入，所以不在 `run-all.sh` 內；agy 升級後執行 `bash tests/dev-council/smoke-agy-allowlist.sh`。
