@@ -54,13 +54,16 @@ CLAUDE.md 每一輪都在 context 裡，作為觸發點比 description 穩定。
   invoke the `noah-tools:dev-council` skill first.
 - Ask directly, without the council, for: authorization to act (commit, push, delete, publish),
   information only the user has (accounts, credentials, outside context), actions the user
-  must perform, and questions raised by dev-council itself (login wait, arbitration).
+  must perform, questions raised by dev-council itself (login wait, arbitration), and
+  questions asked by a skill whose purpose is to interview the user, such as
+  `mattpocock-skills:grilling` (also run by `grill-me` and `grill-with-docs`).
 ```
 
 第二條列出不必會診的情況：
 
 - **授權、只有你知道的資訊、需要你親手做的事**：會診也答不了。在 CLAUDE.md 先排除，這類問題就不會白白載入 SKILL.md。
 - **dev-council 自己的提問**：〈等待登入〉與〈仲裁〉這兩步本身會用 AskUserQuestion。不排除的話，第一條規則會要求這些提問也先會診。
+- **訪談型 skill 的提問**：`mattpocock-skills:grilling` 這類 skill 的用意是讓你自己釐清想法、逐題做決定，由會診代答就失去意義。`grill-me` 與 `grill-with-docs` 都是呼叫 `grilling` 來提問，排除 `grilling` 就涵蓋三者。
 
 ### 放在哪個 CLAUDE.md
 

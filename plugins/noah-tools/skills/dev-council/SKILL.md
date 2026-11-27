@@ -1,6 +1,6 @@
 ---
 name: dev-council
-description: 向使用者提問前的三方會診：main agent 原本要問使用者的問題，先由 Claude subagent、codex cli、agy cli 各自獨立回答後互評，main agent 統整，能定案的直接照做，只把需要使用者仲裁的帶給使用者。Use before asking the user a question or for a decision during development (via AskUserQuestion or in plain text) — except authorization to act (commit, push, delete, publish), information only the user has (accounts, credentials, outside context), or actions the user must perform — or when the user asks for a council or multi-model consultation.
+description: 向使用者提問前的三方會診：main agent 原本要問使用者的問題，先由 Claude subagent、codex cli、agy cli 各自獨立回答後互評，main agent 統整，能定案的直接照做，只把需要使用者仲裁的帶給使用者。Use before asking the user a question or for a decision during development (via AskUserQuestion or in plain text) — except authorization to act (commit, push, delete, publish), information only the user has (accounts, credentials, outside context), actions the user must perform, or questions asked by a skill whose purpose is to interview the user (e.g. grilling) — or when the user asks for a council or multi-model consultation.
 allowed-tools: Bash, Read, Write, Glob, Grep, Agent, AskUserQuestion, PushNotification
 ---
 
@@ -19,6 +19,7 @@ allowed-tools: Bash, Read, Write, Glob, Grep, Agent, AskUserQuestion, PushNotifi
 - 執行前的授權：commit、push、刪除或覆寫、對外發布
 - 只有使用者知道的資訊：帳號、憑證、環境存取、外部的脈絡
 - 需要使用者親手做的事：登入、在其他系統上操作
+- 以訪問使用者為目的的 skill 流程內的提問，如 `mattpocock-skills:grilling`（`grill-me`、`grill-with-docs` 也透過它提問）：這類提問要的是使用者自己的判斷
 - 本 skill 流程內的詢問：〈等待登入〉與〈仲裁〉
 
 同一個問題只會診一次；會診後仍需使用者決定的，依〈仲裁〉詢問。使用者手動呼叫時，以呼叫參數或對話中待決的問題為準。開始前用一句話告訴使用者：原本要問什麼，改為先會診。
